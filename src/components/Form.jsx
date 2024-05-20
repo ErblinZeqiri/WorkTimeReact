@@ -11,6 +11,15 @@ const Form = ({ user, onClose }) => {
   });
   const database = getDatabase(user.app);
 
+  const validateForm = () => {
+    for (let key in work) {
+      if (work[key].trim() === "") {
+        return false;
+      }
+    }
+    return true;
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -19,32 +28,37 @@ const Form = ({ user, onClose }) => {
     // Vérifie si l'entrée pour cette date existe déjà
     const snapshot = await get(userRef);
     if (snapshot.exists()) {
-      const data = snapshot.val();
-      let updateData = {};
+      if (validateForm()) {
+        const data = snapshot.val();
+        let updateData = {};
 
-      // Récupérer les clés existantes
-      const keys = Object.keys(data);
+        // Récupérer les clés existantes
+        const keys = Object.keys(data);
 
-      // Trouver l'index maximum parmi les clés existantes
-      const maxIndex =
-        keys.length > 0 ? Math.max(...keys.map((key) => parseInt(key))) : 0;
+        // Trouver l'index maximum parmi les clés existantes
+        const maxIndex =
+          keys.length > 0 ? Math.max(...keys.map((key) => parseInt(key))) : -1; // Initialiser à -1 au lieu de 0
 
-      // Déterminer le prochain index
-      const nextIndex = maxIndex + 1;
+        // Déterminer le prochain index
+        const nextIndex = maxIndex === -1 ? 0 : maxIndex + 1; // Utiliser 0 si maxIndex est -1
 
-      // Créer la nouvelle clé avec l'index incrémenté
-      const newKey = nextIndex.toString();
+        // Créer la nouvelle clé avec l'index incrémenté
+        const newKey = nextIndex.toString();
 
-      // Ajouter la nouvelle clé avec l'heure d'entrée à l'objet de mise à jour
-      updateData[newKey] = work;
+        // Ajouter la nouvelle clé avec l'heure d'entrée à l'objet de mise à jour
+        updateData[newKey] = work;
+        console.log(userRef, updateData)
 
-      // Mettre à jour la base de données
-      await update(userRef, updateData);
+        // Mettre à jour la base de données
+        await update(userRef, updateData);
+      } else {
+        alert("Veuillez remplir tous les champs du formulaire");
+      }
     } else {
       // Si l'entrée n'existe pas encore, initialiser avec le premier index
       await update(userRef, { 0: work });
     }
-    //onClose();
+    onClose();
   };
 
   const handleChange = (e) => {
@@ -71,6 +85,7 @@ const Form = ({ user, onClose }) => {
               <div className="form-add-data-container">
                 <input
                   type="text"
+                  name="titre" // Ajout de l'attribut name
                   className="form-add-data-input"
                   placeholder="Titre"
                   value={work.titre}
@@ -78,6 +93,7 @@ const Form = ({ user, onClose }) => {
                 />
                 <input
                   type="text"
+                  name="client" // Ajout de l'attribut name
                   className="form-add-data-input"
                   placeholder="Client"
                   value={work.client}
@@ -85,6 +101,7 @@ const Form = ({ user, onClose }) => {
                 />
                 <input
                   type="text"
+                  name="lieu" // Ajout de l'attribut name
                   className="form-add-data-input"
                   placeholder="Lieu"
                   value={work.lieu}
@@ -92,6 +109,7 @@ const Form = ({ user, onClose }) => {
                 />
                 <input
                   type="text"
+                  name="description" // Ajout de l'attribut name
                   className="form-add-data-input"
                   placeholder="Description"
                   value={work.description}
