@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import Form from "./Form"; // Importe le composant de formulaire modal
+import { firebaseConfig } from "../providers/firebaseConfig";
+import Form from "./Form";
 
-const Dashboard = (props) => {
+const Dashboard = () => {
+    const firebase = new firebaseConfig();
     const [user, setUser] = useState(null);
-    const [app, setApp] = useState(props.app);
+    const [app, setApp] = useState(firebase.getApp());
     const [form, setform] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
-        const auth = getAuth(props.app);
+        const auth = getAuth(app);
+        console.log(app)
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
                 const name = user.displayName.split(" ")[0];
@@ -23,6 +26,7 @@ const Dashboard = (props) => {
                     uid: user.uid,
                     capitalizedName,
                     capitalizedFirstName,
+                    app: app
                 });
             } else {
                 navigate("/");
@@ -31,7 +35,7 @@ const Dashboard = (props) => {
 
         // Cleanup subscription on unmount
         return () => unsubscribe();
-    }, [props.app, navigate]);
+    }, [app, navigate]);
 
     const openModal = () => {
         setform(true);
@@ -43,9 +47,10 @@ const Dashboard = (props) => {
 
     return (
         <>
-            {user && <h1>{user.uid} {user.capitalizedName} {user.capitalizedFirstName}</h1>}
+            {user && <h1>Bonjour {user.capitalizedName} {user.capitalizedFirstName}</h1>}
+            <br />
             <button onClick={openModal}>Ouvrir le formulaire</button>
-            {form && <Form onClose={closeModal} />}
+            {form && <Form user={user} onClose={closeModal} />}
         </>
     );
 }
