@@ -1,70 +1,122 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Form.css";
 import { ref, update, get, child, getDatabase } from "firebase/database";
 
 const Form = ({ user, onClose }) => {
-  const [work, setWork] = useState({
-    titre: "",
+  const [prestations, setPrestations] = useState({
+    userId: user.uid,
+    date: "",
     client: "",
-    lieu: "",
+    categorie: "",
     description: "",
+    inter_de: "",
+    inter_a: "",
   });
+
+  const [clients, setClients] = useState([]);
+  const [catPrestas, setCatPresat] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
   const database = getDatabase(user.app);
+
+  useEffect(() => {
+    const fetchClients = async () => {
+      const entrepriseRef = child(
+        ref(database),
+        `entreprises/${user.entrepriseId}/clients`
+      );
+      const snapshot = await get(entrepriseRef);
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        setClients(Object.values(data));
+      } else {
+        console.log("No clients available");
+      }
+    };
+
+    fetchClients();
+  }, [database, user.entrepriseId]);
+
+  useEffect(() => {
+    const fetchcatPresta = async () => {
+      const entrepriseRef = child(
+        ref(database),
+        `entreprises/${user.entrepriseId}/categories_prestations`
+      );
+      const snapshot = await get(entrepriseRef);
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        setCatPresat(Object.values(data));
+      } else {
+        console.log("No clients available");
+      }
+    };
+
+    fetchcatPresta();
+  }, [database, user.entrepriseId]);
+
+  const handleDateChange = (event) => {
+    const { value } = event.target;
+    setPrestations((prevPrestations) => ({
+      ...prevPrestations,
+      date: value,
+    }));
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setWork((prevWork) => ({
-      ...prevWork,
+    setPrestations((prevPrestations) => ({
+      ...prevPrestations,
       [name]: value,
     }));
   };
 
   const validateForm = () => {
-    for (let key in work) {
-      if (work[key].trim() === "") {
+    for (let key in prestations) {
+      if (prestations[key].trim() === "") {
+        return false;
+      } else if (prestations["inter_de"] > prestations["inter_a"]) {
         return false;
       }
     }
     return true;
   };
+  
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const userRef = child(ref(database), `Users/${user.uid}`);
-
-    // Vérifie si l'entrée pour cette date existe déjà
+    const userRef = child(
+      ref(database),
+      `entreprises/${user.entrepriseId}/prestations`
+    );
     const snapshot = await get(userRef);
+
     if (snapshot.exists()) {
       if (validateForm()) {
         const data = snapshot.val();
         let updateData = {};
 
-        // Récupérer les clés existantes
         const keys = Object.keys(data);
 
-        // Trouver l'index maximum parmi les clés existantes
         const maxIndex =
-          keys.length > 0 ? Math.max(...keys.map((key) => parseInt(key))) : -1; // Initialiser à -1 au lieu de 0
+          keys.length > 0 ? Math.max(...keys.map((key) => parseInt(key))) : -1;
 
-        // Déterminer le prochain index
-        const nextIndex = maxIndex === -1 ? 0 : maxIndex + 1; // Utiliser 0 si maxIndex est -1
+        const nextIndex = maxIndex === -1 ? 0 : maxIndex + 1;
 
-        // Créer la nouvelle clé avec l'index incrémenté
         const newKey = nextIndex.toString();
+        updateData[newKey] = prestations;
 
-        // Ajouter la nouvelle clé avec l'heure d'entrée à l'objet de mise à jour
-        updateData[newKey] = work;
-
-        // Mettre à jour la base de données
         await update(userRef, updateData);
         onClose();
       } else {
-        alert("Veuillez remplir tout les champs.");
+        if (prestations["inter_de"] > prestations["inter_a"]) {
+          setErrorMessage("Mauvaise saisie des intervalles.");
+        } else {
+          setErrorMessage("Veuillez remplir tous les champs.");
+        }
       }
     } else {
-      // Si l'entrée n'existe pas encore, initialiser avec le premier index
-      await update(userRef, { 0: work });
+      await update(userRef, { 0: prestations });
       onClose();
     }
   };
@@ -82,37 +134,69 @@ const Form = ({ user, onClose }) => {
               </a>
               <span className="form-add-data-title">Ajout</span>
               <span className="subtitle">Ajouter une heure de travail.</span>
+              {errorMessage && (
+                <div className="alert alert-danger" role="alert">
+                  {errorMessage}
+                </div>
+              )}
               <div className="form-add-data-container">
                 <input
-                  type="text"
-                  name="titre" // Ajout de l'attribut name
+                  type="date"
+                  name="date"
                   className="form-add-data-input"
-                  placeholder="Titre"
-                  value={work.titre}
-                  onChange={handleChange}
+                  value={prestations.date}
+                  onChange={handleDateChange}
+                  dateformat="yyyy-MM-dd"
+                  placeholder="Select a date"
                 />
-                <input
-                  type="text"
-                  name="client" // Ajout de l'attribut name
+                <select
+                  name="client"
                   className="form-add-data-input"
-                  placeholder="Client"
-                  value={work.client}
+                  value={prestations.client}
                   onChange={handleChange}
-                />
-                <input
-                  type="text"
-                  name="lieu" // Ajout de l'attribut name
+                >
+                  <option value="">Sélectionner un client</option>
+                  {clients.map((client, index) => (
+                    <option key={index} value={client.nom}>
+                      {client.nom}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  name="categorie"
                   className="form-add-data-input"
-                  placeholder="Lieu"
-                  value={work.lieu}
+                  value={prestations.categorie}
                   onChange={handleChange}
-                />
-                <input
-                  type="text"
-                  name="description" // Ajout de l'attribut name
-                  className="form-add-data-input"
+                >
+                  <option value="">Sélectionner une catégorie</option>
+                  {catPrestas.map((catPresta, index) => (
+                    <option key={index} value={catPresta}>
+                      {catPresta}
+                    </option>
+                  ))}
+                </select>
+                <textarea
+                  type="textarea"
+                  name="description"
+                  className="form-add-data-input form-add-data-input-textarea"
                   placeholder="Description"
-                  value={work.description}
+                  value={prestations.description}
+                  onChange={handleChange}
+                />
+                <input
+                  type="time"
+                  name="inter_de"
+                  className="form-add-data-input"
+                  placeholder="Intervalle de prestation"
+                  value={prestations.inter_de}
+                  onChange={handleChange}
+                />
+                <input
+                  type="time"
+                  name="inter_a"
+                  className="form-add-data-input"
+                  placeholder="Intervalle de prestation"
+                  value={prestations.inter_a}
                   onChange={handleChange}
                 />
               </div>

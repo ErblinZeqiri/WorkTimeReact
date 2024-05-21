@@ -8,6 +8,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 999;
 }
 
 .form-content {
@@ -139,6 +140,10 @@
   font-size: .9rem;
   padding: 8px 15px;
   color: #010101;
+}
+
+.form-add-data-input-textarea {
+  height: 15vh !important;
 }
 
 /*Button*/

@@ -3,8 +3,8 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { firebaseConfig } from "../providers/firebaseConfig";
 import Form from "./Form";
+import { getDatabase, ref, get } from "firebase/database";
 import DisplayElements from "./DisplayElements";
-import PlaceSearch from "./PlaceSearch";
 
 const Dashboard = () => {
     const firebase = new firebaseConfig();
@@ -15,20 +15,32 @@ const Dashboard = () => {
 
     useEffect(() => {
         const auth = getAuth(app);
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
+        const db = getDatabase(app);
+        
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user) {
-                const name = user.displayName.split(" ")[0];
-                const firstname = user.displayName.split(" ")[1];
+                const userRef = ref(db, `users/${user.uid}`);
+                const snapshot = await get(userRef);
+                
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    const { entrepriseId } = userData;
+                    const name = user.displayName.split(" ")[0];
+                    const firstname = user.displayName.split(" ")[1];
 
-                const capitalizedName = name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
-                const capitalizedFirstName = firstname.charAt(0).toUpperCase() + firstname.slice(1).toLowerCase();
+                    const capitalizedName = name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+                    const capitalizedFirstName = firstname.charAt(0).toUpperCase() + firstname.slice(1).toLowerCase();
 
-                setUser({
-                    uid: user.uid,
-                    capitalizedName,
-                    capitalizedFirstName,
-                    app: app
-                });
+                    setUser({
+                        uid: user.uid,
+                        capitalizedName,
+                        capitalizedFirstName,
+                        entrepriseId,
+                        app: app
+                    });
+                } else {
+                    console.log("No data available");
+                }
             } else {
                 navigate("/");
             }
@@ -62,9 +74,8 @@ const Dashboard = () => {
             <button onClick={openModal}>Ouvrir le formulaire</button>
             {form && <Form user={user} onClose={closeModal} />}
             <br />
-            {user && <DisplayElements app={app} uid={user.uid}/>}
+            {user && <DisplayElements user={user}/>}
         </div>
-        <PlaceSearch />
         </>
     );
 }
