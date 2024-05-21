@@ -3,6 +3,8 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { firebaseConfig } from "../providers/firebaseConfig";
 import Form from "./Form";
+import DisplayElements from "./DisplayElements";
+import PlaceSearch from "./PlaceSearch";
 
 const Dashboard = () => {
     const firebase = new firebaseConfig();
@@ -13,7 +15,6 @@ const Dashboard = () => {
 
     useEffect(() => {
         const auth = getAuth(app);
-        console.log(app)
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
                 const name = user.displayName.split(" ")[0];
@@ -45,12 +46,25 @@ const Dashboard = () => {
         setform(false);
     };
 
+    const logout = () => {
+        const auth = getAuth(app);
+        auth.signOut().then(() => {
+            navigate("/");
+        });
+    }
+
     return (
         <>
+        <div className="displayElements">
             {user && <h1>Bonjour {user.capitalizedName} {user.capitalizedFirstName}</h1>}
+            <button onClick={logout}>Deconnexion</button>
             <br />
             <button onClick={openModal}>Ouvrir le formulaire</button>
             {form && <Form user={user} onClose={closeModal} />}
+            <br />
+            {user && <DisplayElements app={app} uid={user.uid}/>}
+        </div>
+        <PlaceSearch />
         </>
     );
 }

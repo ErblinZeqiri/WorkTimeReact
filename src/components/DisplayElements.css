@@ -1,0 +1,8 @@
+.displayElements {
+  display: block !important;
+  text-align: center;
+}
+
+.separation {
+  border-top: 1px solid black;
+}

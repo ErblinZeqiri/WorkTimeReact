@@ -11,6 +11,14 @@ const Form = ({ user, onClose }) => {
   });
   const database = getDatabase(user.app);
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setWork((prevWork) => ({
+      ...prevWork,
+      [name]: value,
+    }));
+  };
+
   const validateForm = () => {
     for (let key in work) {
       if (work[key].trim() === "") {
@@ -47,26 +55,18 @@ const Form = ({ user, onClose }) => {
 
         // Ajouter la nouvelle clé avec l'heure d'entrée à l'objet de mise à jour
         updateData[newKey] = work;
-        console.log(userRef, updateData)
 
         // Mettre à jour la base de données
         await update(userRef, updateData);
+        onClose();
       } else {
-        alert("Veuillez remplir tous les champs du formulaire");
+        alert("Veuillez remplir tout les champs.");
       }
     } else {
       // Si l'entrée n'existe pas encore, initialiser avec le premier index
       await update(userRef, { 0: work });
+      onClose();
     }
-    onClose();
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setWork((prevWork) => ({
-      ...prevWork,
-      [name]: value,
-    }));
   };
 
   return (
