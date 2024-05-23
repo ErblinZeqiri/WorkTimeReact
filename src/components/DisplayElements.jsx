@@ -13,6 +13,7 @@ import SortInput from "./SortInput";
 
 const DisplayElements = ({ user }) => {
   const [elements, setElements] = useState([]);
+  const [filters, setFilters] = useState({});
   const [month, setMonth] = useState([
     "janvier",
     "février",
@@ -52,11 +53,35 @@ const DisplayElements = ({ user }) => {
     fetchData();
   }, [user.app, user.uid]);
 
-  const groupedElements = groupByMonth(elements);
+  const applyFilters = (elements) => {
+    if (!filters || Object.keys(filters).length === 0) {
+      return elements;
+    }
+
+    return elements.filter(([key, element]) => {
+      const {
+        client,
+        categorie,
+        mois,
+        date,
+      } = filters;
+
+      const elementMonth = new Date(element.date).toLocaleString('fr-FR', { month: 'long' }).toLowerCase();
+      
+      return (
+        (!client || element.client === client) &&
+        (!categorie || element.categorie === categorie) &&
+        (!mois || elementMonth === mois.toLowerCase()) &&
+        (!date || element.date === date)
+      );
+    });
+  };
+
+  const filteredElements = applyFilters(elements);
+  const groupedElements = groupByMonth(filteredElements);
   const totalWorkTime = totalHoursMinutes(groupedElements);
   const monthComparisons = compareMonthToPrevious(groupedElements);
 
-  // Sort the months in descending order
   const sortedMonths = Object.keys(groupedElements).sort((a, b) => {
     const [aMonth, aYear] = a.split(" ");
     const [bMonth, bYear] = b.split(" ");
@@ -74,7 +99,7 @@ const DisplayElements = ({ user }) => {
   return (
     <>
       <h1>Listes des heures</h1>
-      <SortInput user={user} month={month} />
+      <SortInput user={user} month={month} setFilters={setFilters} />
       {sortedMonths.length > 0 ? (
         <div className="accordion">
           {sortedMonths.map((monthYear, index) => (
@@ -82,17 +107,16 @@ const DisplayElements = ({ user }) => {
               <h2 className="accordion-header" id={`heading${index}`}>
                 <button
                   className="accordion-button collapsed bg-gradient"
-                  style={{ backgroundColor: "#003C43", color: "white"
-                  }}
+                  style={{ backgroundColor: "#003C43", color: "white" }}
                   type="button"
                   data-bs-toggle="collapse"
                   data-bs-target={`#collapse${index}`}
                   aria-expanded="false"
                   aria-controls={`collapse${index}`}
                 >
-                  {`${monthYear} | ${totalWorkTime[monthYear].totalHours}h ${totalWorkTime[monthYear].totalMinutes}m | `}
+                  {`${monthYear} | ${totalWorkTime[monthYear].totalHours}h ${totalWorkTime[monthYear].totalMinutes}m `}
                   {monthComparisons[monthYear] !== null && (
-                    <span> {monthComparisons[monthYear].toFixed(2)}%</span>
+                    <span> | {monthComparisons[monthYear].toFixed(2)}%</span>
                   )}
                 </button>
               </h2>

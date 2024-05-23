@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ref, get, child, getDatabase } from "firebase/database";
 
-const SortInput = ({ user, month }) => {
+const SortInput = ({ user, month, setFilters }) => {
   const [prestations, setPrestations] = useState({
     userId: user.uid,
     date: "",
@@ -61,9 +61,7 @@ const SortInput = ({ user, month }) => {
   };
 
   const handleSubmit = () => {
-    if (prestations) {
-      console.log("Client sélectionné :", prestations);
-    }
+    setFilters(prestations);
   };
 
   const handleDateChange = (event) => {
@@ -75,7 +73,7 @@ const SortInput = ({ user, month }) => {
   };
 
   const handleResetFilters = () => {
-    setPrestations({
+    const resetState = {
       userId: user.uid,
       date: "",
       client: "", 
@@ -84,9 +82,11 @@ const SortInput = ({ user, month }) => {
       inter_de: "",
       inter_a: "",
       mois: "",
-    });
+    };
+    setPrestations(resetState);
+    setFilters(resetState);
   };
-  
+
   return (
     <>
       <label htmlFor="categorie">Par catégorie :</label>
