@@ -74,13 +74,16 @@ const DisplayElements = ({ user }) => {
   return (
     <>
       <h1>Listes des heures</h1>
+      <SortInput user={user} month={month} />
       {sortedMonths.length > 0 ? (
-        <div className="accordion" id="accordionExample">
+        <div className="accordion">
           {sortedMonths.map((monthYear, index) => (
             <div className="accordion-item" key={index}>
               <h2 className="accordion-header" id={`heading${index}`}>
                 <button
-                  className="accordion-button collapsed bg-primary"
+                  className="accordion-button collapsed bg-gradient"
+                  style={{ backgroundColor: "#003C43", color: "white"
+                  }}
                   type="button"
                   data-bs-toggle="collapse"
                   data-bs-target={`#collapse${index}`}
@@ -99,7 +102,7 @@ const DisplayElements = ({ user }) => {
                 aria-labelledby={`heading${index}`}
                 data-bs-parent="#accordionExample"
               >
-                <div className="accordion-body text-start bg-primary-subtle">
+                <div className="accordion-body text-start" style={{ backgroundColor: "#77B0AA" }}>
                   {groupedElements[monthYear].map((element, idx) => {
                     const { differenceHours, differenceMinutes } =
                       calculateTimeDifference(
