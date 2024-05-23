@@ -1,0 +1,97 @@
+.menu-container {
+    position: relative;
+  }
+  .menuButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 13%;
+    color: #090909;
+    width: 3.5em;
+    height: 3.5em;
+    border-radius: 0.5em;
+    background: #e8e8e8;
+    border: 1px solid #e8e8e8;
+    transition: all .3s;
+    box-shadow: 6px 6px 12px #c5c5c5,
+               -6px -6px 12px #ffffff;
+  }
+  
+  .menuButton:hover {
+    border: 1px solid white;
+  }
+  
+  .menuButton:active {
+    color: #666;
+    box-shadow: inset 4px 4px 12px #c5c5c5,
+               inset -4px -4px 12px #ffffff;
+  }
+  
+  .menu-checkbox {
+    display: none;
+  }
+  
+  .menuButton span {
+    width: 30px;
+    height: 4px;
+    background: #131313;
+    border-radius: 100px;
+    transition: 0.3s ease;
+  }
+  
+  .menu-checkbox:checked + .menuButton .top {
+    transform: translateY(290%) rotate(45deg);
+    width: 40px;
+  }
+  
+  .menu-checkbox:checked + .menuButton .bot {
+    transform: translateY(-270%) rotate(-45deg);
+    width: 40px;
+    box-shadow: 0 0 10px #495057;
+  }
+  
+  .menu-checkbox:checked + .menuButton .mid {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  
+  /* Styles pour les options du menu */
+  .menu-options {
+    display: none;
+    position: absolute;
+    top: 4em;
+    right: 0;
+    background: #e8e8e8;
+    box-shadow: 6px 6px 12px #c5c5c5,
+                -6px -6px 12px #ffffff;
+    border-radius: 0.5em;
+    padding: 1em;
+    list-style: none;
+  }
+  
+  .menu-checkbox:checked ~ .menu-options {
+    display: block;
+  }
+  
+  .menu-options ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+  }
+  
+  .menu-options li {
+    margin: 0.5em 0;
+  }
+  
+  .menu-options a {
+    text-decoration: none;
+    color: #090909;
+    transition: color 0.3s;
+  }
+  
+  .menu-options a:hover {
+    color: #666;
+  }
+  
