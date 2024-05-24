@@ -4,6 +4,7 @@ import './App.css'
 import Login from './components/login'
 import Dashboard from './components/Dashboard';
 import FicheDePaie from './components/FicheDePaie';
+import Page404 from './components/Page404';
 
 function App() {
 
@@ -13,6 +14,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/fiche-de-paie" element={<FicheDePaie />}></Route>
+        <Route path="*" element={<Page404/>}/>
       </Routes>
     </>
   )
