@@ -190,9 +190,9 @@ const DisplayElements = ({ user }) => {
                   {monthComparisons[monthYear] !== null && (
                     <span> | {monthComparisons[monthYear].toFixed(2)}%</span>
                   )}
-                  <button onClick={() => ficheDePaie(monthYear)}>
+                  <a href="#" onClick={() => ficheDePaie(monthYear)}>
                     Fiche de paie
-                  </button>
+                  </a>
                 </button>
               </h2>
               <div
