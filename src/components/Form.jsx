@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./Form.css";
 import { ref, update, get, child, getDatabase } from "firebase/database";
+import { calculateTimeDifference } from "./Utils";
 
 const Form = ({ user, onClose }) => {
   const [prestations, setPrestations] = useState({
@@ -11,6 +12,7 @@ const Form = ({ user, onClose }) => {
     description: "",
     inter_de: "",
     inter_a: "",
+    total_inter: 0,
   });
 
   const [clients, setClients] = useState([]);
@@ -47,7 +49,7 @@ const Form = ({ user, onClose }) => {
         const data = snapshot.val();
         setCatPresat(Object.values(data));
       } else {
-        console.log("No clients available");
+        console.log("No categories available");
       }
     };
 
@@ -72,27 +74,40 @@ const Form = ({ user, onClose }) => {
 
   const validateForm = () => {
     for (let key in prestations) {
-      if (prestations[key].trim() === "") {
-        return false;
-      } else if (prestations["inter_de"] > prestations["inter_a"]) {
+      if (key !== "total_inter" && prestations[key].trim() === "") {
         return false;
       }
     }
+    if (prestations.inter_de > prestations.inter_a) {
+      return false;
+    }
     return true;
   };
-  
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const userRef = child(
-      ref(database),
-      `entreprises/${user.entrepriseId}/prestations`
-    );
-    const snapshot = await get(userRef);
+    if (validateForm()) {
+      const { differenceHours, differenceMinutes } = calculateTimeDifference(
+        prestations.inter_de,
+        prestations.inter_a
+      );
+    
+      const total_inter = `${differenceHours}:${differenceMinutes < 10 ? '0' : ''}${differenceMinutes}`;
+    
 
-    if (snapshot.exists()) {
-      if (validateForm()) {
+      const updatedPrestations = {
+        ...prestations,
+        total_inter,
+      };
+
+      const userRef = child(
+        ref(database),
+        `entreprises/${user.entrepriseId}/prestations`
+      );
+      const snapshot = await get(userRef);
+
+      if (snapshot.exists()) {
         const data = snapshot.val();
         let updateData = {};
 
@@ -104,20 +119,19 @@ const Form = ({ user, onClose }) => {
         const nextIndex = maxIndex === -1 ? 0 : maxIndex + 1;
 
         const newKey = nextIndex.toString();
-        updateData[newKey] = prestations;
+        updateData[newKey] = updatedPrestations;
 
         await update(userRef, updateData);
-        onClose();
       } else {
-        if (prestations["inter_de"] > prestations["inter_a"]) {
-          setErrorMessage("Mauvaise saisie des intervalles.");
-        } else {
-          setErrorMessage("Veuillez remplir tous les champs.");
-        }
+        await update(userRef, { 0: updatedPrestations });
       }
-    } else {
-      await update(userRef, { 0: prestations });
       onClose();
+    } else {
+      if (prestations["inter_de"] > prestations["inter_a"]) {
+        setErrorMessage("Mauvaise saisie des intervalles.");
+      } else {
+        setErrorMessage("Veuillez remplir tous les champs.");
+      }
     }
   };
 

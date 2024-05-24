@@ -10,6 +10,7 @@ import "./DisplayElements.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import SortInput from "./SortInput";
+import { useNavigate } from "react-router-dom";
 
 const DisplayElements = ({ user }) => {
   const [elements, setElements] = useState([]);
@@ -28,10 +29,11 @@ const DisplayElements = ({ user }) => {
     "novembre",
     "décembre",
   ]);
+  const navigate = useNavigate();
+  const database = getDatabase(user.app);
 
   useEffect(() => {
     const fetchData = async () => {
-      const database = getDatabase(user.app);
       const collectionRef = child(
         ref(database),
         `entreprises/${user.entrepriseId}/prestations`
@@ -41,6 +43,7 @@ const DisplayElements = ({ user }) => {
         const snapshot = await get(collectionRef);
         if (snapshot.exists()) {
           const data = snapshot.val();
+
           setElements(Object.entries(data));
         } else {
           console.log("No data available");
@@ -59,15 +62,12 @@ const DisplayElements = ({ user }) => {
     }
 
     return elements.filter(([key, element]) => {
-      const {
-        client,
-        categorie,
-        mois,
-        date,
-      } = filters;
+      const { client, categorie, mois, date } = filters;
 
-      const elementMonth = new Date(element.date).toLocaleString('fr-FR', { month: 'long' }).toLowerCase();
-      
+      const elementMonth = new Date(element.date)
+        .toLocaleString("fr-FR", { month: "long" })
+        .toLowerCase();
+
       return (
         (!client || element.client === client) &&
         (!categorie || element.categorie === categorie) &&
@@ -96,6 +96,32 @@ const DisplayElements = ({ user }) => {
     return bDate - aDate;
   });
 
+  const ficheDePaie = async (monthYear) => {
+    const {
+      uid,
+      capitalizedName,
+      capitalizedFirstName,
+      entrepriseId,
+      tarif_horaire,
+    } = user;
+
+    const entrepriseData = (
+        await get(child(ref(database), `entreprises/${user.entrepriseId}`))
+      ).val();
+    
+      const nomEntreprise = entrepriseData.nom;
+
+    const simpleUser = {
+      uid,
+      capitalizedName,
+      capitalizedFirstName,
+      entrepriseId,
+      tarif_horaire,
+      nomEntreprise,
+    };
+    navigate("/fiche-de-paie", { state: { monthYear, user: simpleUser } });
+  };
+
   return (
     <>
       <h1>Listes des heures</h1>
@@ -118,6 +144,9 @@ const DisplayElements = ({ user }) => {
                   {monthComparisons[monthYear] !== null && (
                     <span> | {monthComparisons[monthYear].toFixed(2)}%</span>
                   )}
+                  <button onClick={() => ficheDePaie(monthYear)}>
+                    Fiche de paie
+                  </button>
                 </button>
               </h2>
               <div
@@ -126,7 +155,10 @@ const DisplayElements = ({ user }) => {
                 aria-labelledby={`heading${index}`}
                 data-bs-parent="#accordionExample"
               >
-                <div className="accordion-body text-start" style={{ backgroundColor: "#77B0AA" }}>
+                <div
+                  className="accordion-body text-start"
+                  style={{ backgroundColor: "#77B0AA" }}
+                >
                   {groupedElements[monthYear].map((element, idx) => {
                     const { differenceHours, differenceMinutes } =
                       calculateTimeDifference(

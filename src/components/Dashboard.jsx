@@ -5,7 +5,7 @@ import { firebaseConfig } from "../providers/firebaseConfig";
 import Form from "./Form";
 import { getDatabase, ref, get } from "firebase/database";
 import DisplayElements from "./DisplayElements";
-import "./Dashboard.css";
+import Menu from "./Menu";
 
 const Dashboard = () => {
   const firebase = new firebaseConfig();
@@ -25,9 +25,9 @@ const Dashboard = () => {
 
         if (snapshot.exists()) {
           const userData = snapshot.val();
-          const { entrepriseId } = userData;
+          const { entrepriseId, tarif_horaire} = userData;
           const [name, firstname] = user.displayName.split(" ");
-
+          
           const capitalizedName =
             name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
           const capitalizedFirstName =
@@ -40,6 +40,7 @@ const Dashboard = () => {
             capitalizedFirstName,
             entrepriseId,
             app: app,
+            tarif_horaire: tarif_horaire
           });
         } else {
           console.log("No data available");
@@ -76,31 +77,7 @@ const Dashboard = () => {
             Bonjour {user.capitalizedName} {user.capitalizedFirstName}
           </h1>
         )}
-        <div className="menu-container">
-          <input id="check" type="checkbox" className="menu-checkbox" />
-          <label htmlFor="check" className="menuButton">
-            <span className="top"></span>
-            <span className="mid"></span>
-            <span className="bot"></span>
-          </label>
-          <div className="menu-options">
-            <ul>
-              <li>
-                <a href="#option3">Fiche de salaire</a>
-              </li>
-              <li>
-                <a href="#" onClick={openModal}>
-                  Ouvrir le formulaire
-                </a>
-              </li>
-              <li>
-                <a href="#" onClick={logout}>
-                  Deconnexion
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
+        <Menu openModal={openModal} logout={logout} />
         <br />
         {form && <Form user={user} onClose={closeModal} />}
         <br />
