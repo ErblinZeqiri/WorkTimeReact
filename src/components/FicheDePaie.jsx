@@ -21,7 +21,14 @@ const FicheDePaie = () => {
         const snapshot = await get(collectionRef);
         if (snapshot.exists()) {
           const data = snapshot.val();
-          setElements(Object.entries(data));
+          if (user.role === "admin") {
+            setElements(Object.entries(data));
+          } else {
+            const userPresta = Object.entries(data).filter(
+              ([key, element]) => element.userId === user.uid
+            );
+            setElements(userPresta);
+          }
         } else {
           console.log("No data available");
         }
@@ -82,13 +89,13 @@ const FicheDePaie = () => {
             <p>
               Total des heures ce mois: {totalHours}h
               <br />
-              Tarif par heure : {user.tarif_horaire}
+              Tarif par heure : {user.tarif_horaire} CHF
               <br />
               Salaire brut : {salaireBrut} CHF
               <br />
-              AVS : {avs}
+              AVS : - {avs} CHF
               <br />
-              Salaire net : {salaireBrut - avs} CHF
+              <strong>Salaire net : {salaireBrut - avs} CHF</strong>
             </p>
           </>
         ) : (

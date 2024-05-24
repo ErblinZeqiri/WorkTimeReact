@@ -29,6 +29,7 @@ const DisplayElements = ({ user }) => {
     "novembre",
     "décembre",
   ]);
+  const [userNames, setUserNames] = useState({});
   const navigate = useNavigate();
   const database = getDatabase(user.app);
 
@@ -44,7 +45,14 @@ const DisplayElements = ({ user }) => {
         if (snapshot.exists()) {
           const data = snapshot.val();
 
-          setElements(Object.entries(data));
+          if (user.role === "admin") {
+            setElements(Object.entries(data));
+          } else {
+            const userPresta = Object.entries(data).filter(
+              ([key, element]) => element.userId === user.uid
+            );
+            setElements(userPresta);
+          }
         } else {
           console.log("No data available");
         }
@@ -54,7 +62,7 @@ const DisplayElements = ({ user }) => {
     };
 
     fetchData();
-  }, [user.app, user.uid]);
+  }, [user.app, user.uid, user.role]);
 
   const applyFilters = (elements) => {
     if (!filters || Object.keys(filters).length === 0) {
@@ -79,6 +87,44 @@ const DisplayElements = ({ user }) => {
 
   const filteredElements = applyFilters(elements);
   const groupedElements = groupByMonth(filteredElements);
+
+  useEffect(() => {
+    const prestaUserIdsMap = {};
+
+    for (const month in groupedElements) {
+      if (groupedElements.hasOwnProperty(month)) {
+        groupedElements[month].forEach((element) => {
+          prestaUserIdsMap[element.userId] = true;
+        });
+      }
+    }
+
+    const userIds = Object.keys(prestaUserIdsMap);
+
+    const fetchUserNames = async () => {
+      for (const userId of userIds) {
+        try {
+          const userSnapshot = await get(
+            child(ref(database), `users/${userId}`)
+          );
+          if (userSnapshot.exists()) {
+            const userData = userSnapshot.val();
+            setUserNames((prevUserNames) => ({
+              ...prevUserNames,
+              [userId]: {
+                nom: userData.nom,
+                prenom: userData.prenom,
+              },
+            }));
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
+      }
+    };
+    fetchUserNames();
+  }, [database, groupedElements]);
+
   const totalWorkTime = totalHoursMinutes(groupedElements);
   const monthComparisons = compareMonthToPrevious(groupedElements);
 
@@ -106,10 +152,10 @@ const DisplayElements = ({ user }) => {
     } = user;
 
     const entrepriseData = (
-        await get(child(ref(database), `entreprises/${user.entrepriseId}`))
-      ).val();
-    
-      const nomEntreprise = entrepriseData.nom;
+      await get(child(ref(database), `entreprises/${user.entrepriseId}`))
+    ).val();
+
+    const nomEntreprise = entrepriseData.nom;
 
     const simpleUser = {
       uid,
@@ -165,8 +211,18 @@ const DisplayElements = ({ user }) => {
                         element.inter_de,
                         element.inter_a
                       );
+                    const userName = userNames[element.userId] || {
+                      nom: "Nom",
+                      prenom: "inconnu",
+                    };
+
                     return (
                       <div key={idx}>
+                        {user.role === "admin" && (
+                          <p>
+                            Nom de l'employé : {userName.nom} {userName.prenom}
+                          </p>
+                        )}
                         <p>Client: {element.client}</p>
                         <p>Date: {element.date}</p>
                         <p>Catégorie: {element.categorie}</p>

@@ -25,7 +25,7 @@ const Dashboard = () => {
 
         if (snapshot.exists()) {
           const userData = snapshot.val();
-          const { entrepriseId, tarif_horaire } = userData;
+          const { entrepriseId, tarif_horaire, role } = userData;
           const [name, firstname] = user.displayName.split(" ");
 
           const capitalizedName =
@@ -41,6 +41,7 @@ const Dashboard = () => {
             entrepriseId,
             app: app,
             tarif_horaire: tarif_horaire,
+            role: role
           });
         } else {
           return (
