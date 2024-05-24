@@ -49,7 +49,7 @@ const FicheDePaie = () => {
   return (
     <>
       <div style={{textAlign: "center"}}>
-        <button onClick={navigate("/dashboard")}>Retour</button>
+        <button onClick={() => navigate("/dashboard")}>Retour</button>
         <h1>Fiche de Paie</h1>
         <h2>Mois de {monthYear}</h2>
         <p>
