@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { groupByMonth } from "./Utils";
 import { ref, get, child, getDatabase } from "firebase/database";
 
@@ -7,6 +7,7 @@ const FicheDePaie = () => {
   const [elements, setElements] = useState([]);
   const location = useLocation();
   const { monthYear, user } = location.state || {};
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,7 +48,8 @@ const FicheDePaie = () => {
   const avs = (salaireBrut * 5) / 100;
   return (
     <>
-      <div>
+      <div style={{textAlign: "center"}}>
+        <button onClick={navigate("/dashboard")}>Retour</button>
         <h1>Fiche de Paie</h1>
         <h2>Mois de {monthYear}</h2>
         <p>

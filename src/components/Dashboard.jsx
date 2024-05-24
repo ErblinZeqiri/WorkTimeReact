@@ -25,9 +25,9 @@ const Dashboard = () => {
 
         if (snapshot.exists()) {
           const userData = snapshot.val();
-          const { entrepriseId, tarif_horaire} = userData;
+          const { entrepriseId, tarif_horaire } = userData;
           const [name, firstname] = user.displayName.split(" ");
-          
+
           const capitalizedName =
             name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
           const capitalizedFirstName =
@@ -40,10 +40,14 @@ const Dashboard = () => {
             capitalizedFirstName,
             entrepriseId,
             app: app,
-            tarif_horaire: tarif_horaire
+            tarif_horaire: tarif_horaire,
           });
         } else {
-          console.log("No data available");
+          return (
+            <>
+              <h1>Aucune données</h1>
+            </>
+          );
         }
       } else {
         navigate("/");
