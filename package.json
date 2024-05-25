@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.2.5",
     "@vis.gl/react-google-maps": "^1.0.0",
     "bootstrap": "^5.3.3",
     "calendar-date": "^2.5.0",

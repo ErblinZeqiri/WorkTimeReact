@@ -17,60 +17,63 @@ const Dashboard = () => {
   useEffect(() => {
     const auth = getAuth(app);
     const db = getDatabase(app);
-
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const userRef = ref(db, `users/${user.uid}`);
-        const snapshot = await get(userRef);
-
-        if (snapshot.exists()) {
-          const userData = snapshot.val();
-          const { entrepriseId, tarif_horaire, role } = userData;
-          const [name, firstname] = user.displayName.split(" ");
-
-          const capitalizedName =
-            name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
-          const capitalizedFirstName =
-            firstname.charAt(0).toUpperCase() +
-            firstname.slice(1).toLowerCase();
-
-          setUser({
-            uid: user.uid,
-            capitalizedName,
-            capitalizedFirstName,
-            entrepriseId,
-            app: app,
-            tarif_horaire: tarif_horaire,
-            role: role
-          });
-        } else {
-          return (
-            <>
-              <h1>Aucune données</h1>
-            </>
+    let unsubscribe = null; 
+    const fetchData = async () => {
+      try {
+        const user = await new Promise((resolve, reject) => {
+          const unsubscribe = onAuthStateChanged(
+            auth,
+            (user) => {
+              unsubscribe();
+              resolve(user);
+            },
+            reject
           );
-        }
-      } else {
-        navigate("/");
-      }
-    });
+        });
 
-    // Cleanup subscription on unmount
-    return () => unsubscribe();
+        if (user) {
+          const userRef = ref(db, `users/${user.uid}`);
+          const snapshot = await get(userRef);
+
+          if (snapshot.exists()) {
+            const userData = snapshot.val();
+            setUser(userData);
+          } else {
+            // Gérer le cas où aucune donnée utilisateur n'est trouvée
+          }
+        } else {
+          navigate("/");
+        }
+      } catch (error) {
+        // Gérer les erreurs d'authentification ou de récupération des données utilisateur
+        console.error(
+          "Une erreur s'est produite lors de la récupération des données utilisateur:",
+          error
+        );
+        // Afficher un message d'erreur à l'utilisateur ou effectuer une action appropriée
+      }
+    };
+
+    fetchData(); // Appel de la fonction fetchData pour récupérer les données utilisateur
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, [app, navigate]);
 
   const openModal = () => {
-    setForm(true);
+    setForm(true); // Affiche le formulaire
   };
 
   const closeModal = () => {
-    setForm(false);
+    setForm(false); // Cache le formulaire
   };
 
   const logout = () => {
     const auth = getAuth(app);
     auth.signOut().then(() => {
-      navigate("/");
+      navigate("/"); // Redirection après déconnexion
     });
   };
 
@@ -79,7 +82,7 @@ const Dashboard = () => {
       <div className="displayElements">
         {user && (
           <h1>
-            Bonjour {user.capitalizedName} {user.capitalizedFirstName}
+            Bonjour {user.nom} {user.prenom}
           </h1>
         )}
         <Menu openModal={openModal} logout={logout} />
