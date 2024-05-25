@@ -1,27 +1,27 @@
-import React, { useState } from "react";
+import React from "react";
+import { useDispatch } from "react-redux";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { firebaseConfig } from "../providers/firebaseConfig";
 import { useNavigate } from "react-router-dom";
+import { setUser } from "./store";
+import { useSelector } from "react-redux";
 
 const GoogleLogin = () => {
-  const [firebaseConf, setFirebaseConf] = useState(new firebaseConfig());
-  const [provider, setProvider] = useState(new GoogleAuthProvider());
-  const [app, setApp] = useState();
-  const [user, setUser] = useState();
-
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const firebaseApp = useSelector((state) => state.firebase);  // Récupération de la configuration Firebase depuis Redux
 
   const handleGoogleLogin = async () => {
-      try {
-        setApp(firebaseConf.getApp());
-        const auth = getAuth(app);
-        const response = await signInWithPopup(auth, provider);
-        setUser(response.user)
-        navigate("/dashboard");
-      } catch (error) {
-        console.log("error: ", error);
-      }
+    try {
+      const auth = getAuth(firebaseApp);
+      const provider = new GoogleAuthProvider();
+      const response = await signInWithPopup(auth, provider);
+      const { uid, email, displayName } = response.user;
+      dispatch(setUser({ uid, email, displayName }));  // Stocker uniquement les données nécessaires
+      navigate("/dashboard");
+    } catch (error) {
+      console.log("error: ", error);
     }
+  };
 
   return (
     <div className="buttons-container" onClick={handleGoogleLogin}>

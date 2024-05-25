@@ -1,22 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import { firebaseConfig } from "../providers/firebaseConfig";
 import Form from "./Form";
+import { useDispatch, useSelector } from "react-redux";
+import { setUser, setFirebase, clearUser } from "./store";
 import { getDatabase, ref, get } from "firebase/database";
 import DisplayElements from "./DisplayElements";
 import Menu from "./Menu";
+import { selectUser, selectFirebase } from "./selectors";
 
 const Dashboard = () => {
-  const firebase = new firebaseConfig();
-  const [user, setUser] = useState(null);
-  const [app, setApp] = useState(firebase.getApp());
+  const dispatch = useDispatch();
   const [form, setForm] = useState(false);
   const navigate = useNavigate();
+  const user = useSelector(state => state.user);
+  const app = useSelector(state => state.firebase);
 
   useEffect(() => {
-    const auth = getAuth(app);
-    const db = getDatabase(app);
+    const auth = getAuth();
+    const db = getDatabase();
     let unsubscribe = null; 
     const fetchData = async () => {
       try {
@@ -37,11 +39,12 @@ const Dashboard = () => {
 
           if (snapshot.exists()) {
             const userData = snapshot.val();
-            setUser(userData);
+            dispatch(setUser({ uid: user.uid, ...userData }));
           } else {
             // Gérer le cas où aucune donnée utilisateur n'est trouvée
           }
         } else {
+          dispatch(clearUser());
           navigate("/");
         }
       } catch (error) {
@@ -55,12 +58,13 @@ const Dashboard = () => {
     };
 
     fetchData(); // Appel de la fonction fetchData pour récupérer les données utilisateur
+    dispatch(setFirebase(app)); // Mettre à jour les informations Firebase dans le store
     return () => {
       if (unsubscribe) {
         unsubscribe();
       }
     };
-  }, [app, navigate]);
+  }, [dispatch, navigate]);
 
   const openModal = () => {
     setForm(true); // Affiche le formulaire
@@ -71,7 +75,7 @@ const Dashboard = () => {
   };
 
   const logout = () => {
-    const auth = getAuth(app);
+    const auth = getAuth();
     auth.signOut().then(() => {
       navigate("/"); // Redirection après déconnexion
     });
