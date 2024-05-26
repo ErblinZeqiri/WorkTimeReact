@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { ref, get, child, getDatabase } from "firebase/database";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchUserData, setClients } from "./store";
+import { getDatabase, ref, child, get } from "firebase/database";
 import {
   calculateTimeDifference,
   groupByMonth,
@@ -12,10 +14,11 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import SortInput from "./SortInput";
 import { useNavigate } from "react-router-dom";
 
-const DisplayElements = ({ user }) => {
+const DisplayElements = () => {
+  const dispatch = useDispatch();
   const [elements, setElements] = useState([]);
-  const [filters, setFilters] = useState({});
-  const [month, setMonth] = useState([
+  const [filters, setFilters] = useState([]);
+  const [month] = useState([
     "janvier",
     "février",
     "mars",
@@ -29,40 +32,49 @@ const DisplayElements = ({ user }) => {
     "novembre",
     "décembre",
   ]);
-  const [userNames, setUserNames] = useState({});
+  const user = useSelector(state => state.user.userData);
+  const firebaseApp = useSelector(state => state.firebase);
   const navigate = useNavigate();
-  const database = getDatabase(user.app);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const collectionRef = child(
-        ref(database),
-        `entreprises/${user.entrepriseId}/prestations`
-      );
+    if (user && firebaseApp) {
+      dispatch(fetchUserData(user.uid)); // Fetch user data
+    }
+  }, [user, firebaseApp, dispatch]);
 
-      try {
-        const snapshot = await get(collectionRef);
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-
-          if (user.role === "admin") {
-            setElements(Object.entries(data));
-          } else {
-            const userPresta = Object.entries(data).filter(
-              ([key, element]) => element.userId === user.uid
-            );
+  // Fetch prestations data when user is available
+  useEffect(() => {
+    if (user) {
+      const fetchData = async () => {
+        const database = getDatabase(firebaseApp);
+        const collectionRef = child(
+          ref(database),
+          `entreprises/${user.entrepriseId}/prestations`
+        );
+        try {
+          const snapshot = await get(collectionRef);
+          if (snapshot.exists()) {
+            const data = snapshot.val();
+            const userPresta = user.role === "admin" ? Object.entries(data) :
+              Object.entries(data).filter(([key, element]) => element.userId === user.uid);
             setElements(userPresta);
+          } else {
+            console.log("No data available");
           }
-        } else {
-          console.log("No data available");
+        } catch (error) {
+          console.error("Error fetching data:", error);
         }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+      };
 
-    fetchData();
-  }, [user.app, user.uid, user.role]);
+      fetchData();
+    }
+  }, [user, firebaseApp]);
+
+  useEffect(() => {
+      if (filters.client) {
+      dispatch(setClients(filters.client));
+    }
+  }, [filters.client, dispatch]);
 
   const applyFilters = (elements) => {
     if (!filters || Object.keys(filters).length === 0) {
@@ -85,45 +97,12 @@ const DisplayElements = ({ user }) => {
     });
   };
 
+  if (!user) {
+    return <div>Loading...</div>;
+  }
+
   const filteredElements = applyFilters(elements);
   const groupedElements = groupByMonth(filteredElements);
-
-  useEffect(() => {
-    const prestaUserIdsMap = {};
-
-    for (const month in groupedElements) {
-      if (groupedElements.hasOwnProperty(month)) {
-        groupedElements[month].forEach((element) => {
-          prestaUserIdsMap[element.userId] = true;
-        });
-      }
-    }
-
-    const userIds = Object.keys(prestaUserIdsMap);
-
-    const fetchUserNames = async () => {
-      for (const userId of userIds) {
-        try {
-          const userSnapshot = await get(
-            child(ref(database), `users/${userId}`)
-          );
-          if (userSnapshot.exists()) {
-            const userData = userSnapshot.val();
-            setUserNames((prevUserNames) => ({
-              ...prevUserNames,
-              [userId]: {
-                nom: userData.nom,
-                prenom: userData.prenom,
-              },
-            }));
-          }
-        } catch (error) {
-          console.error("Error fetching user data:", error);
-        }
-      }
-    };
-    fetchUserNames();
-  }, [database, groupedElements]);
 
   const totalWorkTime = totalHoursMinutes(groupedElements);
   const monthComparisons = compareMonthToPrevious(groupedElements);
@@ -143,24 +122,19 @@ const DisplayElements = ({ user }) => {
   });
 
   const ficheDePaie = async (monthYear) => {
-    const {
-      uid,
-      capitalizedName,
-      capitalizedFirstName,
-      entrepriseId,
-      tarif_horaire,
-    } = user;
+    const { uid, nom, prenom, entrepriseId, tarif_horaire } = user;
 
+    const database = getDatabase(firebaseApp);
     const entrepriseData = (
-      await get(child(ref(database), `entreprises/${user.entrepriseId}`))
+      await get(child(ref(database), `entreprises/${entrepriseId}`))
     ).val();
 
     const nomEntreprise = entrepriseData.nom;
 
     const simpleUser = {
       uid,
-      capitalizedName,
-      capitalizedFirstName,
+      nom,
+      prenom,
       entrepriseId,
       tarif_horaire,
       nomEntreprise,
@@ -171,13 +145,13 @@ const DisplayElements = ({ user }) => {
   return (
     <>
       <h1>Listes des heures</h1>
-      <SortInput user={user} month={month} setFilters={setFilters} />
+      <SortInput month={month} setFilters={setFilters} />
       {sortedMonths.length > 0 ? (
         <div className="accordion">
           {sortedMonths.map((monthYear, index) => (
             <div className="accordion-item" key={index}>
               <h2 className="accordion-header" id={`heading${index}`}>
-                <button
+                <a
                   className="accordion-button collapsed bg-gradient"
                   style={{ backgroundColor: "#003C43", color: "white" }}
                   type="button"
@@ -190,10 +164,14 @@ const DisplayElements = ({ user }) => {
                   {monthComparisons[monthYear] !== null && (
                     <span> | {monthComparisons[monthYear].toFixed(2)}%</span>
                   )}
-                  <a href="#" onClick={() => ficheDePaie(monthYear)}>
+
+                  <button
+                    className="btn-link"
+                    onClick={() => ficheDePaie(monthYear)}
+                  >
                     Fiche de paie
-                  </a>
-                </button>
+                  </button>
+                </a>
               </h2>
               <div
                 id={`collapse${index}`}
@@ -211,16 +189,12 @@ const DisplayElements = ({ user }) => {
                         element.inter_de,
                         element.inter_a
                       );
-                    const userName = userNames[element.userId] || {
-                      nom: "Nom",
-                      prenom: "inconnu",
-                    };
 
                     return (
                       <div key={idx}>
                         {user.role === "admin" && (
                           <p>
-                            Nom de l'employé : {userName.nom} {userName.prenom}
+                            Nom de l'employé : {element.prenom} {element.nom}
                           </p>
                         )}
                         <p>Client: {element.client}</p>

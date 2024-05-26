@@ -3,23 +3,22 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import Form from "./Form";
 import { useDispatch, useSelector } from "react-redux";
-import { setUser, setFirebase, clearUser } from "./store";
+import { fetchUserData, setFirebase, setUser } from "./store";
 import { getDatabase, ref, get } from "firebase/database";
 import DisplayElements from "./DisplayElements";
 import Menu from "./Menu";
-import { selectUser, selectFirebase } from "./selectors";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
   const [form, setForm] = useState(false);
   const navigate = useNavigate();
-  const user = useSelector(state => state.user);
-  const app = useSelector(state => state.firebase);
+  const user = useSelector((state) => state.user.userData);
+  const firebaseApp = useSelector((state) => state.firebase);
 
   useEffect(() => {
     const auth = getAuth();
     const db = getDatabase();
-    let unsubscribe = null; 
+    let unsubscribe = null;
     const fetchData = async () => {
       try {
         const user = await new Promise((resolve, reject) => {
@@ -39,12 +38,13 @@ const Dashboard = () => {
 
           if (snapshot.exists()) {
             const userData = snapshot.val();
-            dispatch(setUser({ uid: user.uid, ...userData }));
+            dispatch(setUser({ uid: user.uid, ...userData })); // Directly set the user data
+            // Optionally, you can still dispatch fetchUserData if you need to fetch more detailed data
+            dispatch(fetchUserData(user.uid));
           } else {
-            // Gérer le cas où aucune donnée utilisateur n'est trouvée
+            dispatch(fetchUserData(user.uid));
           }
         } else {
-          dispatch(clearUser());
           navigate("/");
         }
       } catch (error) {
@@ -58,13 +58,13 @@ const Dashboard = () => {
     };
 
     fetchData(); // Appel de la fonction fetchData pour récupérer les données utilisateur
-    dispatch(setFirebase(app)); // Mettre à jour les informations Firebase dans le store
+    dispatch(setFirebase(firebaseApp)); // Mettre à jour les informations Firebase dans le store
     return () => {
       if (unsubscribe) {
         unsubscribe();
       }
     };
-  }, [dispatch, navigate]);
+  }, [dispatch, navigate, firebaseApp]);
 
   const openModal = () => {
     setForm(true); // Affiche le formulaire
@@ -91,9 +91,9 @@ const Dashboard = () => {
         )}
         <Menu openModal={openModal} logout={logout} />
         <br />
-        {form && <Form user={user} onClose={closeModal} />}
+        {form && <Form onClose={closeModal} />}
         <br />
-        {user && <DisplayElements user={user} />}
+        <DisplayElements />
       </div>
     </>
   );

@@ -1,20 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { ref, get, child, getDatabase } from "firebase/database";
+import { setClients, setPrestations, setCategories } from "./store";
+import { useSelector, useDispatch } from "react-redux";
 
-const SortInput = ({ user, month, setFilters }) => {
-  const [prestations, setPrestations] = useState({
-    userId: user.uid,
-    date: "",
-    client: "",
-    categorie: "",
-    description: "",
-    inter_de: "",
-    inter_a: "",
-    mois: "",
-  });
-  const [clients, setClients] = useState([]);
-  const database = getDatabase(user.app);
-  const [catPrestas, setCatPresat] = useState([]);
+const SortInput = ({ month, setFilters }) => {
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user.userData);
+  const firebaseApp = useSelector((state) => state.firebase);
+  const clients = useSelector((state) => state.clients);
+  const prestations = useSelector((state) => state.prestations);
+  const categories = useSelector((state) => state.categories);
+  const database = getDatabase(firebaseApp);
 
   useEffect(() => {
     const fetchClients = async () => {
@@ -25,17 +21,19 @@ const SortInput = ({ user, month, setFilters }) => {
       const snapshot = await get(entrepriseRef);
       if (snapshot.exists()) {
         const data = snapshot.val();
-        setClients(Object.values(data));
+        dispatch(setClients(data.nom));
       } else {
         console.log("No clients available");
       }
     };
 
-    fetchClients();
-  }, [database, user.entrepriseId]);
+    if (user?.entrepriseId) {
+      fetchClients();
+    }
+  }, [database, user.entrepriseId, dispatch]);
 
   useEffect(() => {
-    const fetchcatPresta = async () => {
+    const fetchCategories = async () => {
       const entrepriseRef = child(
         ref(database),
         `entreprises/${user.entrepriseId}/categories_prestations`
@@ -43,21 +41,20 @@ const SortInput = ({ user, month, setFilters }) => {
       const snapshot = await get(entrepriseRef);
       if (snapshot.exists()) {
         const data = snapshot.val();
-        setCatPresat(Object.values(data));
+        dispatch(setCategories(Object.values(data)));
       } else {
-        console.log("No clients available");
+        console.log("No categories available");
       }
     };
 
-    fetchcatPresta();
-  }, [database, user.entrepriseId]);
+    if (user?.entrepriseId) {
+      fetchCategories();
+    }
+  }, [database, user?.entrepriseId, dispatch]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setPrestations((prevPrestations) => ({
-      ...prevPrestations,
-      [name]: value,
-    }));
+    dispatch(setPrestations({ [name]: value }));
   };
 
   const handleSubmit = () => {
@@ -66,24 +63,21 @@ const SortInput = ({ user, month, setFilters }) => {
 
   const handleDateChange = (event) => {
     const { value } = event.target;
-    setPrestations((prevPrestations) => ({
-      ...prevPrestations,
-      date: value,
-    }));
+    dispatch(setPrestations({ date: value }));
   };
 
   const handleResetFilters = () => {
     const resetState = {
       userId: user.uid,
       date: "",
-      client: "", 
+      client: "",
       categorie: "",
       description: "",
       inter_de: "",
       inter_a: "",
       mois: "",
     };
-    setPrestations(resetState);
+    dispatch(setPrestations(resetState));
     setFilters(resetState);
   };
 
@@ -98,7 +92,7 @@ const SortInput = ({ user, month, setFilters }) => {
         onChange={handleChange}
       >
         <option value="">Sélectionner une catégorie</option>
-        {catPrestas.map((catPresta, index) => (
+        {categories.flatMap((catPresta, index) => (
           <option key={index} value={catPresta}>
             {catPresta}
           </option>
@@ -116,7 +110,7 @@ const SortInput = ({ user, month, setFilters }) => {
         onChange={handleChange}
       >
         <option value="">Sélectionner un client</option>
-        {clients.map((client, index) => (
+        {clients.flatMap((client, index) => (
           <option key={index} value={client.nom}>
             {client.nom}
           </option>
@@ -135,7 +129,7 @@ const SortInput = ({ user, month, setFilters }) => {
         className="form-add-data-input"
       >
         <option value="">Sélectionner un mois</option>
-        {month.map((month, index) => (
+        {month.flatMap((month, index) => (
           <option key={index} value={month}>
             {month}
           </option>

@@ -1,10 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./Form.css";
-import { ref, update, get, child, getDatabase } from "firebase/database";
+import { ref, update, child, get, getDatabase } from "firebase/database";
 import { calculateTimeDifference } from "./Utils";
+import { useDispatch, useSelector } from "react-redux";
+import { addPrestation, setClients, setCategories } from "./store";
 
-const Form = ({ user, onClose }) => {
-  const [prestations, setPrestations] = useState({
+const Form = ({ onClose }) => {
+  const user = useSelector((state) => state.user);
+  const clients = useSelector((state) => state.clients);
+  const categories = useSelector((state) => state.categories);
+  const dispatch = useDispatch();
+
+  const initialPrestationState = {
     userId: user.uid,
     date: "",
     client: "",
@@ -13,10 +20,11 @@ const Form = ({ user, onClose }) => {
     inter_de: "",
     inter_a: "",
     total_inter: 0,
-  });
+  };
 
-  const [clients, setClients] = useState([]);
-  const [catPrestas, setCatPresat] = useState([]);
+  const [currentPrestation, setCurrentPrestation] = useState(
+    initialPrestationState
+  );
   const [errorMessage, setErrorMessage] = useState("");
   const database = getDatabase(user.app);
 
@@ -29,17 +37,13 @@ const Form = ({ user, onClose }) => {
       const snapshot = await get(entrepriseRef);
       if (snapshot.exists()) {
         const data = snapshot.val();
-        setClients(Object.values(data));
+        dispatch(setClients(Object.values(data)));
       } else {
-        console.log("No clients available");
+        console.log("Aucun client disponible");
       }
     };
 
-    fetchClients();
-  }, [database, user.entrepriseId]);
-
-  useEffect(() => {
-    const fetchcatPresta = async () => {
+    const fetchCategories = async () => {
       const entrepriseRef = child(
         ref(database),
         `entreprises/${user.entrepriseId}/categories_prestations`
@@ -47,38 +51,39 @@ const Form = ({ user, onClose }) => {
       const snapshot = await get(entrepriseRef);
       if (snapshot.exists()) {
         const data = snapshot.val();
-        setCatPresat(Object.values(data));
+        dispatch(setCategories(Object.values(data)));
       } else {
-        console.log("No categories available");
+        console.log("Aucune catégorie disponible");
       }
     };
 
-    fetchcatPresta();
-  }, [database, user.entrepriseId]);
+    fetchClients();
+    fetchCategories();
+  }, [database, user.entrepriseId, dispatch]);
 
   const handleDateChange = (event) => {
     const { value } = event.target;
-    setPrestations((prevPrestations) => ({
-      ...prevPrestations,
+    setCurrentPrestation((prevPrestation) => ({
+      ...prevPrestation,
       date: value,
     }));
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setPrestations((prevPrestations) => ({
-      ...prevPrestations,
+    setCurrentPrestation((prevPrestation) => ({
+      ...prevPrestation,
       [name]: value,
     }));
   };
 
   const validateForm = () => {
-    for (let key in prestations) {
-      if (key !== "total_inter" && prestations[key].trim() === "") {
+    for (let key in currentPrestation) {
+      if (key !== "total_inter" && currentPrestation[key].trim() === "") {
         return false;
       }
     }
-    if (prestations.inter_de > prestations.inter_a) {
+    if (currentPrestation.inter_de > currentPrestation.inter_a) {
       return false;
     }
     return true;
@@ -89,15 +94,16 @@ const Form = ({ user, onClose }) => {
 
     if (validateForm()) {
       const { differenceHours, differenceMinutes } = calculateTimeDifference(
-        prestations.inter_de,
-        prestations.inter_a
+        currentPrestation.inter_de,
+        currentPrestation.inter_a
       );
-    
-      const total_inter = `${differenceHours}:${differenceMinutes < 10 ? '0' : ''}${differenceMinutes}`;
-    
 
-      const updatedPrestations = {
-        ...prestations,
+      const total_inter = `${differenceHours}:${
+        differenceMinutes < 10 ? "0" : ""
+      }${differenceMinutes}`;
+
+      const updatedPrestation = {
+        ...currentPrestation,
         total_inter,
       };
 
@@ -112,22 +118,21 @@ const Form = ({ user, onClose }) => {
         let updateData = {};
 
         const keys = Object.keys(data);
-
         const maxIndex =
           keys.length > 0 ? Math.max(...keys.map((key) => parseInt(key))) : -1;
-
         const nextIndex = maxIndex === -1 ? 0 : maxIndex + 1;
-
         const newKey = nextIndex.toString();
-        updateData[newKey] = updatedPrestations;
+        updateData[newKey] = updatedPrestation;
 
         await update(userRef, updateData);
       } else {
-        await update(userRef, { 0: updatedPrestations });
+        await update(userRef, { 0: updatedPrestation });
       }
+
+      dispatch(addPrestation(updatedPrestation));
       onClose();
     } else {
-      if (prestations["inter_de"] > prestations["inter_a"]) {
+      if (currentPrestation.inter_de > currentPrestation.inter_a) {
         setErrorMessage("Mauvaise saisie des intervalles.");
       } else {
         setErrorMessage("Veuillez remplir tous les champs.");
@@ -158,7 +163,7 @@ const Form = ({ user, onClose }) => {
                   type="date"
                   name="date"
                   className="form-add-data-input"
-                  value={prestations.date}
+                  value={currentPrestation.date}
                   onChange={handleDateChange}
                   dateformat="yyyy-MM-dd"
                   placeholder="Select a date"
@@ -166,7 +171,7 @@ const Form = ({ user, onClose }) => {
                 <select
                   name="client"
                   className="form-add-data-input"
-                  value={prestations.client}
+                  value={currentPrestation.client}
                   onChange={handleChange}
                 >
                   <option value="">Sélectionner un client</option>
@@ -179,11 +184,11 @@ const Form = ({ user, onClose }) => {
                 <select
                   name="categorie"
                   className="form-add-data-input"
-                  value={prestations.categorie}
+                  value={currentPrestation.categorie}
                   onChange={handleChange}
                 >
                   <option value="">Sélectionner une catégorie</option>
-                  {catPrestas.map((catPresta, index) => (
+                  {categories.map((catPresta, index) => (
                     <option key={index} value={catPresta}>
                       {catPresta}
                     </option>
@@ -194,7 +199,7 @@ const Form = ({ user, onClose }) => {
                   name="description"
                   className="form-add-data-input form-add-data-input-textarea"
                   placeholder="Description"
-                  value={prestations.description}
+                  value={currentPrestation.description}
                   onChange={handleChange}
                 />
                 <input
@@ -202,7 +207,7 @@ const Form = ({ user, onClose }) => {
                   name="inter_de"
                   className="form-add-data-input"
                   placeholder="Intervalle de prestation"
-                  value={prestations.inter_de}
+                  value={currentPrestation.inter_de}
                   onChange={handleChange}
                 />
                 <input
@@ -210,7 +215,7 @@ const Form = ({ user, onClose }) => {
                   name="inter_a"
                   className="form-add-data-input"
                   placeholder="Intervalle de prestation"
-                  value={prestations.inter_a}
+                  value={currentPrestation.inter_a}
                   onChange={handleChange}
                 />
               </div>
