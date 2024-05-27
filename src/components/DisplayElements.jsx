@@ -18,6 +18,7 @@ const DisplayElements = () => {
   const dispatch = useDispatch();
   const [elements, setElements] = useState([]);
   const [filters, setFilters] = useState([]);
+  const [usersData, setUsersData] = useState({});
   const [month] = useState([
     "janvier",
     "février",
@@ -32,8 +33,8 @@ const DisplayElements = () => {
     "novembre",
     "décembre",
   ]);
-  const user = useSelector(state => state.user.userData);
-  const firebaseApp = useSelector(state => state.firebase);
+  const user = useSelector((state) => state.user.userData);
+  const firebaseApp = useSelector((state) => state.firebase);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -42,22 +43,35 @@ const DisplayElements = () => {
     }
   }, [user, firebaseApp, dispatch]);
 
-  // Fetch prestations data when user is available
+  // Fetch prestations data and user data when user is available
   useEffect(() => {
     if (user) {
       const fetchData = async () => {
         const database = getDatabase(firebaseApp);
-        const collectionRef = child(
+        const prestationsRef = child(
           ref(database),
           `entreprises/${user.entrepriseId}/prestations`
         );
+        const usersRef = child(ref(database), `users`);
+
         try {
-          const snapshot = await get(collectionRef);
-          if (snapshot.exists()) {
-            const data = snapshot.val();
-            const userPresta = user.role === "admin" ? Object.entries(data) :
-              Object.entries(data).filter(([key, element]) => element.userId === user.uid);
+          const [prestationsSnapshot, usersSnapshot] = await Promise.all([
+            get(prestationsRef),
+            get(usersRef)
+          ]);
+
+          if (prestationsSnapshot.exists() && usersSnapshot.exists()) {
+            const prestationsData = prestationsSnapshot.val();
+            const usersData = usersSnapshot.val();
+
+            const userPresta = user.role === "admin"
+              ? Object.entries(prestationsData)
+              : Object.entries(prestationsData).filter(
+                  ([key, element]) => element.userId === user.uid
+                );
+
             setElements(userPresta);
+            setUsersData(usersData);
           } else {
             console.log("No data available");
           }
@@ -71,7 +85,7 @@ const DisplayElements = () => {
   }, [user, firebaseApp]);
 
   useEffect(() => {
-      if (filters.client) {
+    if (filters.client) {
       dispatch(setClients(filters.client));
     }
   }, [filters.client, dispatch]);
@@ -190,11 +204,13 @@ const DisplayElements = () => {
                         element.inter_a
                       );
 
+                    const userData = usersData[element.userId];
+
                     return (
                       <div key={idx}>
-                        {user.role === "admin" && (
+                        {user.role === "admin" && userData && (
                           <p>
-                            Nom de l'employé : {element.prenom} {element.nom}
+                            Nom de l'employé : {userData.prenom} {userData.nom}
                           </p>
                         )}
                         <p>Client: {element.client}</p>
