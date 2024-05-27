@@ -23,7 +23,7 @@ const Form = ({ onClose }) => {
     inter_a: "",
     total_inter: 0,
   };
-console.log(user)
+  
   const [currentPrestation, setCurrentPrestation] = useState(initialPrestationState);
   const [errorMessage, setErrorMessage] = useState("");
 
