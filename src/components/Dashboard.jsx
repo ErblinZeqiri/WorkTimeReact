@@ -38,8 +38,7 @@ const Dashboard = () => {
 
           if (snapshot.exists()) {
             const userData = snapshot.val();
-            dispatch(setUser({ uid: user.uid, ...userData })); // Directly set the user data
-            // Optionally, you can still dispatch fetchUserData if you need to fetch more detailed data
+            dispatch(setUser({ uid: user.uid, ...userData }));
             dispatch(fetchUserData(user.uid));
           } else {
             dispatch(fetchUserData(user.uid));

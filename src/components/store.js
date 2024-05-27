@@ -3,6 +3,7 @@ import {
   createSlice,
   createAsyncThunk,
 } from "@reduxjs/toolkit";
+import { getDatabase, ref, get } from "firebase/database";
 import firebaseApp from "../providers/firebaseConfig";
 
 // Création du slice pour l'état de l'utilisateur
@@ -73,13 +74,14 @@ const prestationsSlice = createSlice({
 const fetchUserData = createAsyncThunk(
   "user/fetchUserData",
   async (userId, thunkAPI) => {
-    const userData = await firebaseApp
-      .database()
-      .ref(`/users/${userId}`)
-      .once("value")
-      .then((snapshot) => snapshot.val());
-    return userData;
-  }
+    try {
+    const response = user.userId
+    return response.data
+    }
+    catch{
+      return thunkAPI.rejectWithValue("Erreur lors de la récupération des données utilisateur")
+    }
+  },
 );
 
 // Slice for clients
@@ -88,14 +90,13 @@ const clientsSlice = createSlice({
   initialState: [],
   reducers: {
     setClients: (state, action) => {
-      // console.log(action.payload)
-      // console.log(action.payload.entrepriseId)
-      // console.log(action.payload.entrepriseId.clients)
+      if (action.payload && action.payload.entrepriseId) {
         return action.payload.entrepriseId.clients;
+      }
+      return state; // Return the existing state if action.payload is undefined
     },
   },
 });
-
 
 // Slice for categories
 const categoriesSlice = createSlice({
@@ -103,11 +104,13 @@ const categoriesSlice = createSlice({
   initialState: [],
   reducers: {
     setCategories: (state, action) => {
-      return action.payload.entrepriseId.categories_prestations;
+      if (action.payload && action.payload.entrepriseId) {
+        return action.payload.entrepriseId.categories_prestations;
+      }
+      return state; // Return the existing state if action.payload is undefined
     },
   },
 });
-
 
 // Exporting actions
 export const { setUser, clearUser } = userSlice.actions;

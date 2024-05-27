@@ -21,7 +21,7 @@ const SortInput = ({ month, setFilters }) => {
       const snapshot = await get(entrepriseRef);
       if (snapshot.exists()) {
         const data = snapshot.val();
-        dispatch(setClients(data.nom));
+        dispatch(setClients({ entrepriseId: { clients: Object.values(data) } }));
       } else {
         console.log("No clients available");
       }
@@ -30,7 +30,7 @@ const SortInput = ({ month, setFilters }) => {
     if (user?.entrepriseId) {
       fetchClients();
     }
-  }, [database, user.entrepriseId, dispatch]);
+  }, [database, user?.entrepriseId, dispatch]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -41,7 +41,7 @@ const SortInput = ({ month, setFilters }) => {
       const snapshot = await get(entrepriseRef);
       if (snapshot.exists()) {
         const data = snapshot.val();
-        dispatch(setCategories(Object.values(data)));
+        dispatch(setCategories({ entrepriseId: { categories_prestations: Object.values(data) } }));
       } else {
         console.log("No categories available");
       }
@@ -92,13 +92,12 @@ const SortInput = ({ month, setFilters }) => {
         onChange={handleChange}
       >
         <option value="">Sélectionner une catégorie</option>
-        {categories.flatMap((catPresta, index) => (
+        {categories.map((catPresta, index) => (
           <option key={index} value={catPresta}>
             {catPresta}
           </option>
         ))}
       </select>
-
       <br />
 
       <label htmlFor="client">Par client :</label>
@@ -110,13 +109,12 @@ const SortInput = ({ month, setFilters }) => {
         onChange={handleChange}
       >
         <option value="">Sélectionner un client</option>
-        {clients.flatMap((client, index) => (
+        {Array.isArray(clients) ? clients.map((client, index) => (
           <option key={index} value={client.nom}>
             {client.nom}
           </option>
-        ))}
+        )) : null}
       </select>
-
       <br />
 
       <label htmlFor="mois">Par mois :</label>
@@ -129,13 +127,12 @@ const SortInput = ({ month, setFilters }) => {
         className="form-add-data-input"
       >
         <option value="">Sélectionner un mois</option>
-        {month.flatMap((month, index) => (
+        {month.map((month, index) => (
           <option key={index} value={month}>
             {month}
           </option>
         ))}
       </select>
-
       <br />
 
       <label htmlFor="date">Par date :</label>
@@ -148,7 +145,6 @@ const SortInput = ({ month, setFilters }) => {
         onChange={handleDateChange}
         placeholder="Sélectionner une date"
       />
-
       <br />
 
       <button onClick={handleSubmit}>Search</button>
