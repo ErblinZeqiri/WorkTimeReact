@@ -52,24 +52,22 @@ const DisplayElements = () => {
           ref(database),
           `entreprises/${user.entrepriseId}/prestations`
         );
-        const usersRef = child(ref(database), `users`);
-
+        const usersRef = child(ref(database), `users/`);
         try {
           const [prestationsSnapshot, usersSnapshot] = await Promise.all([
             get(prestationsRef),
-            get(usersRef)
+            get(usersRef),
           ]);
 
           if (prestationsSnapshot.exists() && usersSnapshot.exists()) {
             const prestationsData = prestationsSnapshot.val();
             const usersData = usersSnapshot.val();
-
-            const userPresta = user.role === "admin"
-              ? Object.entries(prestationsData)
-              : Object.entries(prestationsData).filter(
-                  ([key, element]) => element.userId === user.uid
-                );
-
+            const userPresta =
+              user.role === "admin"
+                ? Object.entries(prestationsData)
+                : Object.entries(prestationsData).filter(
+                    ([key, element]) => element && element.userId === user.uid
+                  );
             setElements(userPresta);
             setUsersData(usersData);
           } else {
@@ -156,6 +154,11 @@ const DisplayElements = () => {
     navigate("/fiche-de-paie", { state: { monthYear, user: simpleUser } });
   };
 
+  const facture = (monthYear) => {
+    const prestationsDuMois = groupedElements[monthYear];
+    navigate("/dashboard/facture", { state: { prestationsDuMois } });
+  };
+
   return (
     <>
       <h1>Listes des heures</h1>
@@ -178,13 +181,22 @@ const DisplayElements = () => {
                   {monthComparisons[monthYear] !== null && (
                     <span> | {monthComparisons[monthYear].toFixed(2)}%</span>
                   )}
-
-                  <button
-                    className="btn-link"
-                    onClick={() => ficheDePaie(monthYear)}
-                  >
-                    Fiche de paie
-                  </button>
+                  {user.role === "admin" ? (
+                    <>
+                      <button className="btn-link" onClick={() => facture(monthYear)}>
+                        Facture
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        className="btn-link"
+                        onClick={() => ficheDePaie(monthYear)}
+                      >
+                        Fiche de paie
+                      </button>
+                    </>
+                  )}
                 </a>
               </h2>
               <div
@@ -197,34 +209,36 @@ const DisplayElements = () => {
                   className="accordion-body text-start"
                   style={{ backgroundColor: "#77B0AA" }}
                 >
-                  {groupedElements[monthYear].map((element, idx) => {
-                    const { differenceHours, differenceMinutes } =
-                      calculateTimeDifference(
-                        element.inter_de,
-                        element.inter_a
-                      );
+                  {groupedElements[monthYear]
+                    .sort((a, b) => new Date(a.date) - new Date(b.date))
+                    .map((element, idx) => {
+                      const { differenceHours, differenceMinutes } =
+                        calculateTimeDifference(
+                          element.inter_de,
+                          element.inter_a
+                        );
+                      const userData = usersData[element.userId];
 
-                    const userData = usersData[element.userId];
-
-                    return (
-                      <div key={idx}>
-                        {user.role === "admin" && userData && (
+                      return (
+                        <div key={idx}>
+                          {user.role === "admin" && userData && (
+                            <p>
+                              Nom de l'employé : {userData.prenom}{" "}
+                              {userData.nom}
+                            </p>
+                          )}
+                          <p>Client: {element.client}</p>
+                          <p>Date: {element.date}</p>
+                          <p>Catégorie: {element.categorie}</p>
+                          <p>Description: {element.description}</p>
                           <p>
-                            Nom de l'employé : {userData.prenom} {userData.nom}
+                            Temps de travail: {differenceHours}h :{" "}
+                            {differenceMinutes}m
                           </p>
-                        )}
-                        <p>Client: {element.client}</p>
-                        <p>Date: {element.date}</p>
-                        <p>Catégorie: {element.categorie}</p>
-                        <p>Description: {element.description}</p>
-                        <p>
-                          Temps de travail: {differenceHours}h :{" "}
-                          {differenceMinutes}m
-                        </p>
-                        {idx < elements.length - 1 && <hr />}
-                      </div>
-                    );
-                  })}
+                          {idx < elements.length - 1 && <hr />}
+                        </div>
+                      );
+                    })}
                 </div>
               </div>
             </div>
