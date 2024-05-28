@@ -1,8 +1,116 @@
 .displayElements {
+  width: 90vw;
+  height: 50vh;
   display: block !important;
   text-align: center;
+  margin: 0;
 }
 
 .separation {
   border-top: 1px solid black;
+}
+
+.form-select {
+  background-color: #135d66;
+  border-color: #003c43;
+  color: white;
+  outline: 0;
+}
+
+.accordion-presta {
+  margin-top: 3vh;
+}
+
+.accordion-item {
+  border: 1px solid #003c43;
+}
+
+.accordion-button {
+  background-color: #135d66;
+}
+
+.accordion-button:not(.collapsed) .stat-presta {
+  background-color: #003c43;
+  border-color: #003c43;
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: #003c43;
+  border-color: #003c43;
+}
+
+.accordion-header {
+  border-color: #003c43;
+}
+
+.ant-card-body {
+  padding: 0 !important;
+}
+
+.stat-presta {
+  text-decoration: none;
+  color: black;
+  font-size: 24px;
+  width: 13vw;
+  height: 10vh;
+  padding: 1vh;
+  background-color: #135d66;
+  border-radius: 10%;
+  margin-right: 2vw;
+  box-shadow: 4px 12px 10px rgba(0, 0, 0, 0.1) !important;
+}
+
+.stat-presta:hover {
+  text-decoration: none;
+}
+
+.btn-link {
+  --green: #1bfd9c;
+  font-size: 15px;
+  padding: 0.7em 2.7em;
+  letter-spacing: 0.06em;
+  position: relative;
+  font-family: inherit;
+  border-radius: 0.6em;
+  overflow: hidden;
+  transition: all 0.3s;
+  line-height: 1.4em;
+  border: 2px solid var(--green);
+  background: linear-gradient(
+    to right,
+    rgba(27, 253, 156, 0.1) 1%,
+    transparent 40%,
+    transparent 60%,
+    rgba(27, 253, 156, 0.1) 100%
+  );
+  color: var(--green);
+  box-shadow: inset 0 0 10px rgba(27, 253, 156, 0.4),
+    0 0 9px 3px rgba(27, 253, 156, 0.1);
+}
+
+.btn-link:hover {
+  color: #82ffc9;
+  box-shadow: inset 0 0 10px rgba(27, 253, 156, 0.6),
+    0 0 9px 3px rgba(27, 253, 156, 0.2);
+}
+
+.btn-link:before {
+  content: "";
+  position: absolute;
+  left: -4em;
+  width: 4em;
+  height: 100%;
+  top: 0;
+  transition: transform 0.4s ease-in-out;
+  background: linear-gradient(
+    to right,
+    transparent 1%,
+    rgba(27, 253, 156, 0.1) 40%,
+    rgba(27, 253, 156, 0.1) 60%,
+    transparent 100%
+  );
+}
+
+btn-link:hover:before {
+  transform: translateX(15em);
 }

@@ -21,7 +21,9 @@ const SortInput = ({ month, setFilters }) => {
       const snapshot = await get(entrepriseRef);
       if (snapshot.exists()) {
         const data = snapshot.val();
-        dispatch(setClients({ entrepriseId: { clients: Object.values(data) } }));
+        dispatch(
+          setClients({ entrepriseId: { clients: Object.values(data) } })
+        );
       } else {
         console.log("No clients available");
       }
@@ -41,7 +43,11 @@ const SortInput = ({ month, setFilters }) => {
       const snapshot = await get(entrepriseRef);
       if (snapshot.exists()) {
         const data = snapshot.val();
-        dispatch(setCategories({ entrepriseId: { categories_prestations: Object.values(data) } }));
+        dispatch(
+          setCategories({
+            entrepriseId: { categories_prestations: Object.values(data) },
+          })
+        );
       } else {
         console.log("No categories available");
       }
@@ -83,72 +89,85 @@ const SortInput = ({ month, setFilters }) => {
 
   return (
     <>
-      <label htmlFor="categorie">Par catégorie :</label>
-      <br />
-      <select
-        name="categorie"
-        className="form-add-data-input"
-        value={prestations.categorie}
-        onChange={handleChange}
-      >
-        <option value="">Sélectionner une catégorie</option>
-        {categories.map((catPresta, index) => (
-          <option key={index} value={catPresta}>
-            {catPresta}
-          </option>
-        ))}
-      </select>
-      <br />
-
-      <label htmlFor="client">Par client :</label>
-      <br />
-      <select
-        name="client"
-        className="form-add-data-input"
-        value={prestations.client}
-        onChange={handleChange}
-      >
-        <option value="">Sélectionner un client</option>
-        {Array.isArray(clients) ? clients.map((client, index) => (
-          <option key={index} value={client.nom}>
-            {client.nom}
-          </option>
-        )) : null}
-      </select>
-      <br />
-
-      <label htmlFor="mois">Par mois :</label>
-      <br />
-      <select
-        id="mois"
-        name="mois"
-        value={prestations.mois}
-        onChange={handleChange}
-        className="form-add-data-input"
-      >
-        <option value="">Sélectionner un mois</option>
-        {month.map((month, index) => (
-          <option key={index} value={month}>
-            {month}
-          </option>
-        ))}
-      </select>
-      <br />
-
-      <label htmlFor="date">Par date :</label>
-      <br />
-      <input
-        type="date"
-        name="date"
-        className="form-add-data-input"
-        value={prestations.date}
-        onChange={handleDateChange}
-        placeholder="Sélectionner une date"
-      />
-      <br />
-
-      <button onClick={handleSubmit}>Search</button>
-      <button onClick={handleResetFilters}>Reset Filters</button>
+      <div className="container">
+        <div className="row">
+          <div className="col">
+            <select
+              name="categorie"
+              className="form-select"
+              aria-label="Default select example"
+              value={prestations.categorie}
+              onChange={handleChange}
+            >
+              <option value="">Sélectionner une catégorie</option>
+              {categories.map((catPresta, index) => (
+                <option key={index} value={catPresta}>
+                  {catPresta}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="col">
+            <select
+              name="client"
+              className="form-select"
+              aria-label="Default select example"
+              value={prestations.client}
+              onChange={handleChange}
+            >
+              <option value="">Sélectionner un client</option>
+              {Array.isArray(clients)
+                ? clients.map((client, index) => (
+                    <option key={index} value={client.nom}>
+                      {client.nom}
+                    </option>
+                  ))
+                : null}
+            </select>
+          </div>
+          <div className="col">
+            <select
+              id="mois"
+              name="mois"
+              className="form-select"
+              aria-label="Default select example"
+              value={prestations.mois}
+              onChange={handleChange}
+            >
+              <option value="">Sélectionner un mois</option>
+              {month.map((month, index) => (
+                <option key={index} value={month}>
+                  {month}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="col">
+            <input
+              type="date"
+              name="date"
+              className="form-select"
+              value={prestations.date}
+              onChange={handleDateChange}
+              placeholder="Sélectionner une date"
+            />
+          </div>
+          <div className="col">
+            <button
+              className="btn btn-outline-primary me-2"
+              onClick={handleSubmit}
+            >
+              Search
+            </button>
+            <button
+              className="btn btn-outline-danger"
+              onClick={handleResetFilters}
+            >
+              Reset Filters
+            </button>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

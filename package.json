@@ -12,6 +12,8 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.5",
     "@vis.gl/react-google-maps": "^1.0.0",
+    "ant-design": "^1.0.0",
+    "antd": "^5.17.4",
     "bootstrap": "^5.3.3",
     "calendar-date": "^2.5.0",
     "firebase": "^10.12.0",
