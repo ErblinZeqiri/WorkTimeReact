@@ -88,6 +88,8 @@ const Dashboard = () => {
             Bonjour {user.nom} {user.prenom}
           </h1>
         )}
+        <br />
+        <h2>Listes des heures</h2>
         <Menu openModal={openModal} logout={logout} />
         <br />
         {form && <Form onClose={closeModal} />}

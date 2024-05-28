@@ -1,21 +1,23 @@
 import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getDatabase, ref, get } from "firebase/database";
+import "./loading.css";
+import "./Facture.css";
 
 const Facture = () => {
   const location = useLocation();
   const { prestationsDuMois } = location.state;
   const firebaseApp = useSelector((state) => state.firebase);
-
   const [clients, setClients] = useState({});
   const [tarifHoraire, setTarifHoraire] = useState(0);
   const [loading, setLoading] = useState(true);
-
   const totalHours = prestationsDuMois.reduce((total, element) => {
-    const [hours, minutes] = element.total_inter.split(':').map(Number);
+    const [hours, minutes] = element.total_inter.split(":").map(Number);
     return total + hours + minutes / 60;
   }, 0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,8 +38,18 @@ const Facture = () => {
   }, [firebaseApp]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="loader">
+        <span>&lt;</span>
+        <span>LOADING</span>
+        <span>/&gt;</span>
+      </div>
+    );
   }
+
+  const retour = () => {
+    navigate("/dashboard");
+  };
 
   const client = Object.values(clients).find(
     (c) => c.nom === prestationsDuMois[0].client
@@ -49,37 +61,61 @@ const Facture = () => {
 
   const rabais = client.rabais;
   const prixBrut = totalHours * tarifHoraire;
-  const prixNet = prixBrut - (prixBrut * rabais / 100);
+  const prixNet = prixBrut - (prixBrut * rabais) / 100;
 
   return (
     <>
-      <h1>Facture</h1>
-      <h2>{client.nom}</h2>
-      <br />
-      {prestationsDuMois.flatMap((element) => (
-        <div key={element.date + element.client}>
-          <p>
-            {element.categorie}
-            <br />
-            {element.date}
-            <br />
-            {element.total_inter}
-          </p>
-          <br />
+      <div className="facture">
+        <h1>Facture</h1>
+        <button onClick={() => retour()}>Retour</button>
+        <br />
+        <h2>{client.nom}</h2>
+        <br />
+        <div className="presta">
+          <table>
+            <tr>
+              <td>Date</td>
+              <td>Catégorie</td>
+              <td className="right-align">Temps de travail</td>
+            </tr>
+            <tbody>
+              {prestationsDuMois.flatMap((element, index) => (
+                <tr key={index}>
+                  <td>{element.date}</td>
+                  <td>{element.categorie}</td>
+                  <td className="right-align">{element.total_inter}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      ))}
-
-      <p>
-        Total des heures ce mois : {totalHours.toFixed(2)}h
-        <br />
-        Tarif par heure : {tarifHoraire} CHF
-        <br />
-        Prix brut : {prixBrut.toFixed(2)} CHF
-        <br />
-        Rabais : - {rabais}% ({(prixBrut * rabais / 100).toFixed(2)} CHF)
-        <br />
-        <strong>Prix net : {prixNet.toFixed(2)} CHF</strong>
-      </p>
+        <div className="total">
+          <table>
+            <tr>
+              <td>Total des heures ce mois :</td>
+              <td className="right-align">{totalHours.toFixed(2)}h</td>
+            </tr>
+            <tr>
+              <td>Tarif par heure :</td>
+              <td className="right-align">{tarifHoraire} CHF</td>
+            </tr>
+            <tr>
+              <td>Prix brut :</td>
+              <td className="right-align">{prixBrut.toFixed(2)} CHF</td>
+            </tr>
+            <tr>
+              <td>Rabais :</td>
+              <td className="right-align">
+                - {rabais}% ({((prixBrut * rabais) / 100).toFixed(2)} CHF)
+              </td>
+            </tr>
+            <tr>
+              <td>Prix net :</td>
+              <td className="right-align">{prixNet.toFixed(2)} CHF</td>
+            </tr>
+          </table>
+        </div>
+      </div>
     </>
   );
 };

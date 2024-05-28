@@ -1,6 +1,8 @@
 .displayElements {
-  width: 90vw;
-  height: 50vh;
+  max-width: 100vw;
+  width: 100vw;
+  max-height: 90vh;
+  height: 90vh;
   display: block !important;
   text-align: center;
   margin: 0;
@@ -18,6 +20,9 @@
 }
 
 .accordion-presta {
+  overflow-y: auto;
+  height: 60vh;
+  border-radius: 10px;
   margin-top: 3vh;
 }
 
@@ -43,27 +48,6 @@
   border-color: #003c43;
 }
 
-.ant-card-body {
-  padding: 0 !important;
-}
-
-.stat-presta {
-  text-decoration: none;
-  color: black;
-  font-size: 24px;
-  width: 13vw;
-  height: 10vh;
-  padding: 1vh;
-  background-color: #135d66;
-  border-radius: 10%;
-  margin-right: 2vw;
-  box-shadow: 4px 12px 10px rgba(0, 0, 0, 0.1) !important;
-}
-
-.stat-presta:hover {
-  text-decoration: none;
-}
-
 .btn-link {
   --green: #1bfd9c;
   font-size: 15px;
@@ -76,13 +60,11 @@
   transition: all 0.3s;
   line-height: 1.4em;
   border: 2px solid var(--green);
-  background: linear-gradient(
-    to right,
-    rgba(27, 253, 156, 0.1) 1%,
-    transparent 40%,
-    transparent 60%,
-    rgba(27, 253, 156, 0.1) 100%
-  );
+  background: linear-gradient(to right,
+      rgba(27, 253, 156, 0.1) 1%,
+      transparent 40%,
+      transparent 60%,
+      rgba(27, 253, 156, 0.1) 100%);
   color: var(--green);
   box-shadow: inset 0 0 10px rgba(27, 253, 156, 0.4),
     0 0 9px 3px rgba(27, 253, 156, 0.1);
@@ -102,15 +84,44 @@
   height: 100%;
   top: 0;
   transition: transform 0.4s ease-in-out;
-  background: linear-gradient(
-    to right,
-    transparent 1%,
-    rgba(27, 253, 156, 0.1) 40%,
-    rgba(27, 253, 156, 0.1) 60%,
-    transparent 100%
-  );
+  background: linear-gradient(to right,
+      transparent 1%,
+      rgba(27, 253, 156, 0.1) 40%,
+      rgba(27, 253, 156, 0.1) 60%,
+      transparent 100%);
 }
 
-btn-link:hover:before {
+.btn-link:hover:before {
   transform: translateX(15em);
+}
+
+.ant-card-body {
+  padding: 0 !important;
+}
+
+.stat-presta {
+  text-decoration: none;
+  color: rgb(181, 216, 255);
+  font-size: 24px;
+  width: 13vw;
+  height: 8vh;
+  padding: 1vh;
+  background-color: #003C43;
+  border-radius: 10px;
+  margin-right: 2vw;
+  /* box-shadow: 12px 12px 12px rgba(0, 0, 0, 0.1) !important; */
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-presta:hover {
+  background-color: #77B0AA;
+  -webkit-box-shadow: 0px 0px 81px 0px rgba(119, 176, 170, 1);
+  -moz-box-shadow: 0px 0px 81px 0px rgba(119, 176, 170, 1);
+  box-shadow: 0px 0px 81px 0px rgba(119, 176, 170, 1);
+  color: black;
+  transition: background-color 0.3s ease;
+
 }

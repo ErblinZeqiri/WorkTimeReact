@@ -1,28 +1,26 @@
-import React from 'react';
-import './Menu.css';
+import React from "react";
+import "./Menu.css";
+import { useSelector } from "react-redux";
 
 const Menu = ({ openModal, logout }) => {
+  const user = useSelector((state) => state.user.userData);
+
   return (
     <div className="menu-container">
-      {/* Case à cocher pour le bouton de menu */}
       <input id="check" type="checkbox" className="menu-checkbox" />
-      {/* Bouton de menu déroulant */}
       <label htmlFor="check" className="menuButton">
-        {/* Trois lignes pour simuler un hamburger menu */}
-        <span className="top"></span>
-        <span className="mid"></span>
-        <span className="bot"></span>
+        <span>
+          {user && <>{user.nom}</>}
+          <img src="./src/assets/images/down-arrow.svg" />
+        </span>
       </label>
-      {/* Options de menu */}
       <div className="menu-options">
         <ul>
-          {/* Option pour ouvrir le formulaire */}
           <li>
             <a href="#" onClick={openModal}>
               Ouvrir le formulaire
             </a>
           </li>
-          {/* Option pour se déconnecter */}
           <li>
             <a href="#" onClick={logout}>
               Déconnexion

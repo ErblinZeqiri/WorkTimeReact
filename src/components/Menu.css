@@ -8,17 +8,18 @@
     flex-direction: column;
     gap: 13%;
     color: #090909;
-    width: 3.5em;
-    height: 3.5em;
+    max-width: 10vw;
+    max-height: 10vh;
+    height: 4vh;
     border-radius: 0.5em;
-    background: #e8e8e8;
-    border: 1px solid #e8e8e8;
+    background: #E3FEF7;
     transition: all .3s;
-    box-shadow: 6px 6px 12px #c5c5c5,
-               -6px -6px 12px #ffffff;
+    box-shadow: 2px 2px 12px black,
+               -6px -6px 12px #E3FEF7;
     cursor: pointer;
     position: absolute;
-    right: 0;
+    right: 9%;
+    padding: 1vh;
   }
   
   .menuButton:hover {
@@ -27,50 +28,27 @@
   
   .menuButton:active {
     color: #666;
-    box-shadow: inset 4px 4px 12px #c5c5c5,
-               inset -4px -4px 12px #ffffff;
+    box-shadow: inset 4px 4px 12px black,
+               inset -4px -4px 12px #E3FEF7;
   }
   
   .menu-checkbox {
     display: none;
   }
-  
-  .menuButton span {
-    width: 30px;
-    height: 4px;
-    background: #131313;
-    border-radius: 100px;
-    transition: 0.3s ease;
-  }
-  
-  .menu-checkbox:checked + .menuButton .top {
-    transform: translateY(290%) rotate(45deg);
-    width: 40px;
-  }
-  
-  .menu-checkbox:checked + .menuButton .bot {
-    transform: translateY(-270%) rotate(-45deg);
-    width: 40px;
-    box-shadow: 0 0 10px #495057;
-  }
-  
-  .menu-checkbox:checked + .menuButton .mid {
-    transform: translateX(-20px);
-    opacity: 0;
-  }
-  
+      
   /* Styles pour les options du menu */
   .menu-options {
     display: none;
     position: absolute;
-    top: 4em;
-    right: 0;
-    background: #e8e8e8;
-    box-shadow: 6px 6px 12px #c5c5c5,
-                -6px -6px 12px #ffffff;
+    top: 2.7em;
+    right: 10%;
+    background: #E3FEF7;
+    box-shadow: 2px 2px 12px black,
+                -6px -6px 12px #E3FEF7;
     border-radius: 0.5em;
     padding: 1em;
     list-style: none;
+    z-index: 1;
   }
   
   .menu-checkbox:checked ~ .menu-options {
@@ -98,3 +76,8 @@
     color: #666;
   }
   
+  
+  .menuButton img {
+    max-width: 4vw;
+    max-height: 4vh;
+  }

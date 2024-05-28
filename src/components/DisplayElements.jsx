@@ -9,6 +9,7 @@ import {
   compareMonthToPrevious,
 } from "./Utils";
 import "./DisplayElements.css";
+import "./loading.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import SortInput from "./SortInput";
@@ -112,7 +113,13 @@ const DisplayElements = () => {
   };
 
   if (!user) {
-    return <div>Loading...</div>;
+    return (
+      <div className="loader">
+        <span>&lt;</span>
+        <span>LOADING</span>
+        <span>/&gt;</span>
+      </div>
+    );
   }
 
   const filteredElements = applyFilters(elements);
@@ -168,7 +175,6 @@ const DisplayElements = () => {
           <Col span={20}>
             <Card bordered={false} className="stat-presta">
               <Statistic
-                title="Active"
                 value={pourcent}
                 precision={2}
                 valueStyle={{
@@ -187,7 +193,6 @@ const DisplayElements = () => {
           <Col span={20}>
             <Card bordered={false} className="stat-presta">
               <Statistic
-                title="Idle"
                 value={pourcent}
                 precision={2}
                 valueStyle={{
@@ -205,7 +210,6 @@ const DisplayElements = () => {
 
   return (
     <>
-      <h1>Listes des heures</h1>
       <SortInput month={month} setFilters={setFilters} />
       {sortedMonths.length > 0 ? (
         <div className="container accordion-presta">
@@ -223,9 +227,8 @@ const DisplayElements = () => {
                       aria-controls={`collapse${index}`}
                     >
                       <span className="stat-presta">
-                        {monthYear.charAt(0).toUpperCase() + monthYear.slice(1)}
-                      </span>
-                      <span className="stat-presta">
+                        {`Total des heures:`}
+                        <br />
                         {`${totalWorkTime[monthYear].totalHours}h ${totalWorkTime[monthYear].totalMinutes}m`}
                       </span>
                       {monthComparisons[monthYear] !== null && (
@@ -235,6 +238,9 @@ const DisplayElements = () => {
                           )}
                         </span>
                       )}
+                      <span className="stat-presta">
+                        {monthYear.charAt(0).toUpperCase() + monthYear.slice(1)}
+                      </span>
                       {user.role === "admin" ? (
                         <>
                           <button
@@ -262,10 +268,7 @@ const DisplayElements = () => {
                     aria-labelledby={`heading${index}`}
                     data-bs-parent="#accordionExample"
                   >
-                    <div
-                      className="accordion-body text-start"
-                      style={{ backgroundColor: "#77B0AA" }}
-                    >
+                    <div className="accordion-body text-start">
                       {groupedElements[monthYear]
                         .sort((a, b) => new Date(a.date) - new Date(b.date))
                         .map((element, idx) => {
@@ -278,20 +281,39 @@ const DisplayElements = () => {
 
                           return (
                             <div key={idx}>
-                              {user.role === "admin" && userData && (
-                                <p>
-                                  Nom de l'employé : {userData.prenom}{" "}
-                                  {userData.nom}
-                                </p>
-                              )}
-                              <p>Client: {element.client}</p>
-                              <p>Date: {element.date}</p>
-                              <p>Catégorie: {element.categorie}</p>
-                              <p>Description: {element.description}</p>
-                              <p>
-                                Temps de travail: {differenceHours}h :{" "}
-                                {differenceMinutes}m
-                              </p>
+                              <>
+                                <div className="list-group">
+                                  <a className="list-group-item list-group-item-action">
+                                    <div className="d-flex w-100 justify-content-between">
+                                      <h5 className="mb-1">
+                                        {element.categorie}
+                                      </h5>
+                                      <small>{element.date}</small>
+                                    </div>
+                                    <div className="d-flex w-100 justify-content-between">
+                                      <p className="mb-1">{element.client}</p>
+                                      <p>
+                                        Temps de travail: {differenceHours}h :{" "}
+                                        {differenceMinutes}m
+                                      </p>
+                                    </div>
+                                    <p>{element.description}</p>
+                                    {user.role === "admin" && userData && (
+                                      <div className="d-flex w-100 justify-content-between">
+                                        <small>
+                                          Nom de l'employé : {userData.prenom}{" "}
+                                          {userData.nom}
+                                        </small>
+                                        <small>
+                                          <button className="btn btn-secondary">
+                                            Editer
+                                          </button>
+                                        </small>
+                                      </div>
+                                    )}
+                                  </a>
+                                </div>
+                              </>
                               {idx < elements.length - 1 && <hr />}
                             </div>
                           );
