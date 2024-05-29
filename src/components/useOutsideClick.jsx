@@ -1,12 +1,12 @@
 import { useEffect, useRef } from "react";
 
-export const useOutsideClick = () => {
+export const useOutsideClick = (callback) => {
   const ref = useRef();
 
   useEffect(() => {
-    const handleClickOutside = (event, func) => {
+    const handleClickOutside = (event) => {
       if (ref.current && !ref.current.contains(event.target)) {
-        func();
+        callback();
       }
     };
 
@@ -17,7 +17,7 @@ export const useOutsideClick = () => {
       document.removeEventListener("mouseup", handleClickOutside);
       document.removeEventListener("touchend", handleClickOutside);
     };
-  });
+  }, [callback]);
 
   return ref;
 };

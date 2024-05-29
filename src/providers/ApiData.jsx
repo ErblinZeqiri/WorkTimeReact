@@ -6,6 +6,7 @@ const ApiData = () => {
   const [entreprise, setEntreprise] = useState(null);
   const [nomEntreprises, setNomEntreprises] = useState([]);
   const [option, setOption] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
@@ -74,10 +75,14 @@ const ApiData = () => {
     setOption(nom);
     setShowDropdown(false);
   };
-  
+
   const ref = useOutsideClick(() => {
-    setShowDropdown(false)
+    setShowDropdown(false);
   });
+
+  const filteredOptions = nomEntreprises.filter((nom) =>
+    nom.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <>
@@ -91,11 +96,12 @@ const ApiData = () => {
           onFocus={() => setShowDropdown(true)}
           onChange={(evt) => {
             setOption(evt.target.value);
+            setSearchTerm(evt.target.value);
             setShowDropdown(true);
           }}
         />
         <div className="dropdown-content input">
-          {nomEntreprises.map((nom, index) => (
+          {filteredOptions.map((nom, index) => (
             <a
               href="#"
               key={index}
