@@ -1,7 +1,23 @@
-.facture {
+.resultat {
     padding: 3%;
     max-width: 100vw;
     width: 30vw;
+    background-color: white;
+}
+
+.titre {
+    overflow: hidden;
+}
+
+.titre h1 {
+    display: inline-block;
+    margin: 0;
+}
+
+.titre button {
+    float: right;
+    /* Pousse le bouton à droite */
+    vertical-align: middle;
 }
 
 .content {
@@ -10,7 +26,8 @@
     margin-bottom: 5vh;
 }
 
-.total table, .content table {
+.total table,
+.content table {
     width: 100%;
 }
 

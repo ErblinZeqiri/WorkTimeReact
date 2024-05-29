@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react";
-import "./Form.css";
-import { ref, update, child, get, getDatabase } from "firebase/database";
+import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { getDatabase, ref, child, get } from "firebase/database";
 import { calculateTimeDifference } from "./Utils";
-import { useDispatch, useSelector } from "react-redux";
+import "./DisplayElements.css";
+import "./loading.css";
 import { addPrestation, setClients, setCategories } from "./store";
 
-const Form = ({ onClose }) => {
+const UpdatePresta = ({onClose}) => {
   const user = useSelector((state) => state.user.userData);
   const clients = useSelector((state) => state.clients);
   const firebaseApp = useSelector((state) => state.firebase);
@@ -23,13 +24,18 @@ const Form = ({ onClose }) => {
     inter_a: "",
     total_inter: 0,
   };
-  
-  const [currentPrestation, setCurrentPrestation] = useState(initialPrestationState);
+
+  const [currentPrestation, setCurrentPrestation] = useState(
+    initialPrestationState
+  );
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     const fetchClients = async () => {
-      const entrepriseRef = child(ref(database), `entreprises/${user.entrepriseId}/clients`);
+      const entrepriseRef = child(
+        ref(database),
+        `entreprises/${user.entrepriseId}/clients`
+      );
       const snapshot = await get(entrepriseRef);
       if (snapshot.exists()) {
         const data = snapshot.val();
@@ -46,7 +52,10 @@ const Form = ({ onClose }) => {
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const entrepriseRef = child(ref(database), `entreprises/${user.entrepriseId}/categories_prestations`);
+      const entrepriseRef = child(
+        ref(database),
+        `entreprises/${user.entrepriseId}/categories_prestations`
+      );
       const snapshot = await get(entrepriseRef);
       if (snapshot.exists()) {
         const data = snapshot.val();
@@ -79,7 +88,10 @@ const Form = ({ onClose }) => {
 
   const validateForm = () => {
     for (let key in currentPrestation) {
-      if (key !== "total_inter" && (!currentPrestation[key] || currentPrestation[key].trim() === "")) {
+      if (
+        key !== "total_inter" &&
+        (!currentPrestation[key] || currentPrestation[key].trim() === "")
+      ) {
         return false;
       }
     }
@@ -98,19 +110,27 @@ const Form = ({ onClose }) => {
         currentPrestation.inter_a
       );
 
-      const total_inter = `${differenceHours}:${differenceMinutes < 10 ? "0" : ""}${differenceMinutes}`;
+      const total_inter = `${differenceHours}:${
+        differenceMinutes < 10 ? "0" : ""
+      }${differenceMinutes}`;
 
       const updatedPrestation = {
         ...currentPrestation,
         total_inter,
       };
 
-      const userRef = child(ref(database), `entreprises/${user.entrepriseId}/prestations`);
+      const userRef = child(
+        ref(database),
+        `entreprises/${user.entrepriseId}/prestations`
+      );
       const snapshot = await get(userRef);
 
       if (snapshot.exists()) {
         const data = snapshot.val();
-        const maxIndex = Math.max(...Object.keys(data).map(key => parseInt(key, 10)), -1);
+        const maxIndex = Math.max(
+          ...Object.keys(data).map((key) => parseInt(key, 10)),
+          -1
+        );
         const nextIndex = maxIndex + 1;
         const newKey = nextIndex.toString();
 
@@ -120,7 +140,7 @@ const Form = ({ onClose }) => {
       }
 
       dispatch(addPrestation(updatedPrestation));
-      onClose();
+      // onClose();
     } else {
       if (currentPrestation.inter_de > currentPrestation.inter_a) {
         setErrorMessage("Mauvaise saisie des intervalles.");
@@ -215,4 +235,4 @@ const Form = ({ onClose }) => {
   );
 };
 
-export default Form;
+export default UpdatePresta;

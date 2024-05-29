@@ -8,6 +8,7 @@ const FicheDePaie = () => {
   const location = useLocation();
   const { monthYear, user } = location.state || {};
   const navigate = useNavigate();
+  console.log(user);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,48 +56,70 @@ const FicheDePaie = () => {
   const avs = (salaireBrut * 5) / 100;
   return (
     <>
-      <div style={{textAlign: "center"}}>
-        <button onClick={() => navigate("/dashboard")}>Retour</button>
-        <h1>Fiche de Paie</h1>
+      <div className="resultat">
+        <div className="titre">
+          <h1>Fiche de Paie</h1>
+          <button onClick={() => navigate("/dashboard")}>Retour</button>
+        </div>
         <h2>Mois de {monthYear}</h2>
         <p>
-          {user.capitalizedName} {user.capitalizedFirstName}
+          {user.nom} {user.prenom}
         </p>
         <p>{user.nomEntreprise}</p>
-        <h2>Détails des heures:</h2>
+        <h2>Détails des préstations:</h2>
+
         {elementsForMonth.length > 0 ? (
           <>
-            <table>
-              <thead>
-                <tr>
-                  <td>Date</td>
-                  <td>Client</td>
-                  <td>Catégorie</td>
-                  <td>Nombre d'heures</td>
-                </tr>
-              </thead>
-              <tbody>
-                {elementsForMonth.map((element, idx) => (
-                  <tr key={idx}>
-                    <td className="border">{element.date}</td>
-                    <td className="border">{element.client}</td>
-                    <td className="border">{element.categorie}</td>
-                    <td className="border">{element.total_inter}h</td>
+            <div className="content">
+              <table>
+                <thead>
+                  <tr>
+                    <td>Date</td>
+                    <td>Client</td>
+                    <td>Catégorie</td>
+                    <td className="right-align">Nombre d'heures</td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-            <p>
-              Total des heures ce mois: {totalHours}h
-              <br />
-              Tarif par heure : {user.tarif_horaire} CHF
-              <br />
-              Salaire brut : {salaireBrut} CHF
-              <br />
-              AVS : - {avs} CHF
-              <br />
-              <strong>Salaire net : {salaireBrut - avs} CHF</strong>
-            </p>
+                </thead>
+                <tbody>
+                  {elementsForMonth.map((element, idx) => (
+                    <tr key={idx}>
+                      <td>{element.date}</td>
+                      <td>{element.client}</td>
+                      <td>{element.categorie}</td>
+                      <td className="right-align">{element.total_inter}h</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="total">
+              <table>
+                <tr>
+                  <td>Total des heures ce mois:</td>
+                  <td className="right-align">{totalHours}h</td>
+                </tr>
+                <tr>
+                  <td>Tarif par heure :</td>
+                  <td className="right-align">{user.tarif_horaire} CHF</td>
+                </tr>
+                <tr>
+                  <td>Salaire brut :</td>
+                  <td className="right-align">{salaireBrut} CHF</td>
+                </tr>
+                <tr>
+                  <td>AVS :</td>
+                  <td className="right-align">- {avs} CHF</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Salaire net :</strong>
+                  </td>
+                  <td className="right-align">
+                    <strong>{salaireBrut - avs} CHF</strong>
+                  </td>
+                </tr>
+              </table>
+            </div>
           </>
         ) : (
           <p>Pas d'heures enregistrées pour ce mois.</p>

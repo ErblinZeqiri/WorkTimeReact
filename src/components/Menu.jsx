@@ -12,7 +12,10 @@ const Menu = ({ openModal, logout }) => {
   });
 
   const toggleDropdown = () => {
-    setShowDropdown(!showDropdown);
+    setShowDropdown((prevState) => !prevState);
+  };
+  const handleMenuClick = () => {
+    toggleDropdown();
   };
 
   return (
@@ -21,7 +24,7 @@ const Menu = ({ openModal, logout }) => {
       className={`menu-container dropdown ${showDropdown ? "show" : ""}`}
     >
       <input id="check" type="checkbox" className="menu-checkbox" />
-      <label htmlFor="check" className="menuButton" onClick={toggleDropdown}>
+      <label htmlFor="check" className="menuButton" onClick={handleMenuClick}>
         <span>
           {user && <>{user.nom}</>}
           <img src="./src/assets/images/down-arrow.svg" alt="Down Arrow" />

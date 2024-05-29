@@ -8,7 +8,7 @@ import "./Facture.css";
 
 const Facture = () => {
   const location = useLocation();
-  const { prestationsDuMois } = location.state;
+  const { prestationsDuMois, monthYear } = location.state;
   const firebaseApp = useSelector((state) => state.firebase);
   const [clients, setClients] = useState({});
   const [tarifHoraire, setTarifHoraire] = useState(0);
@@ -18,7 +18,7 @@ const Facture = () => {
     return total + hours + minutes / 60;
   }, 0);
   const navigate = useNavigate();
-  
+
   useEffect(() => {
     const fetchData = async () => {
       const database = getDatabase(firebaseApp);
@@ -34,7 +34,7 @@ const Facture = () => {
           console.log("No data available");
         }
       }
-      
+
       setLoading(false);
     };
     fetchData();
@@ -65,11 +65,13 @@ const Facture = () => {
   return (
     <>
       <div className="resultat">
-        <h1>Facture</h1>
-        <button onClick={() => navigate("/dashboard")}>Retour</button>
-        <br />
-        <h2>{client.nom}</h2>
-        <br />
+        <div className="titre">
+          <h1>Facture</h1>
+          <button onClick={() => navigate("/dashboard")}>Retour</button>
+        </div>
+        <h2>Mois de {monthYear}</h2>
+        <p>{client.nom}</p>
+        <h2>Détails des préstations:</h2>
         <div className="content">
           <table>
             <tr>
@@ -109,8 +111,12 @@ const Facture = () => {
               </td>
             </tr>
             <tr>
-              <td>Prix net :</td>
-              <td className="right-align">{prixNet.toFixed(2)} CHF</td>
+              <td>
+                <strong>Prix net :</strong>
+              </td>
+              <td className="right-align">
+                <strong>{prixNet.toFixed(2)} CHF</strong>
+              </td>
             </tr>
           </table>
         </div>

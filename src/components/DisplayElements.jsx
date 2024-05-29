@@ -16,7 +16,7 @@ import SortInput from "./SortInput";
 import { useNavigate } from "react-router-dom";
 import { ArrowDownOutlined, ArrowUpOutlined } from "@ant-design/icons";
 import { Card, Col, Row, Statistic } from "antd";
-import Form from "./Form.jsx";
+import UpdatePresta from "./UpdatePresta.jsx";
 
 const DisplayElements = () => {
   const dispatch = useDispatch();
@@ -168,7 +168,7 @@ const DisplayElements = () => {
 
   const facture = (monthYear) => {
     const prestationsDuMois = groupedElements[monthYear];
-    navigate("/dashboard/facture", { state: { prestationsDuMois } });
+    navigate("/dashboard/facture", { state: { prestationsDuMois, monthYear } });
   };
 
   const pourcentCardDesign = (pourcent) => {
@@ -212,13 +212,13 @@ const DisplayElements = () => {
   };
 
   const toogleShowAddForm = (data) => {
-    setForm(!form)
+    setForm(!form);
     setSelectedData(data);
     setForm((prevShowForm) => !prevShowForm);
-  };  
+  };
 
   const closeModal = () => {
-    setForm(false); // Cache le formulaire
+    setForm(false);
   };
 
   return (
@@ -320,7 +320,9 @@ const DisplayElements = () => {
                                         <small>
                                           <button
                                             className="btn btn-secondary"
-                                            onClick={() => toogleShowAddForm(element)}
+                                            onClick={() =>
+                                              toogleShowAddForm(element)
+                                            }
                                           >
                                             Editer
                                           </button>
@@ -334,7 +336,9 @@ const DisplayElements = () => {
                             </div>
                           );
                         })}
-                      {form && selectedData && <Form data={selectedData} onClose={closeModal} />}
+                      {form && selectedData && (
+                        <UpdatePresta data={selectedData} onClose={closeModal} />
+                      )}
                     </div>
                   </div>
                 </div>
