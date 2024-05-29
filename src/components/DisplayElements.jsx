@@ -16,6 +16,7 @@ import SortInput from "./SortInput";
 import { useNavigate } from "react-router-dom";
 import { ArrowDownOutlined, ArrowUpOutlined } from "@ant-design/icons";
 import { Card, Col, Row, Statistic } from "antd";
+import Form from "./Form.jsx";
 
 const DisplayElements = () => {
   const dispatch = useDispatch();
@@ -38,6 +39,8 @@ const DisplayElements = () => {
   ]);
   const user = useSelector((state) => state.user.userData);
   const firebaseApp = useSelector((state) => state.firebase);
+  const [form, setForm] = useState(true);
+  const [selectedData, setSelectedData] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -208,6 +211,16 @@ const DisplayElements = () => {
     }
   };
 
+  const toogleShowAddForm = (data) => {
+    setForm(!form)
+    setSelectedData(data);
+    setForm((prevShowForm) => !prevShowForm);
+  };  
+
+  const closeModal = () => {
+    setForm(false); // Cache le formulaire
+  };
+
   return (
     <>
       <SortInput month={month} setFilters={setFilters} />
@@ -305,7 +318,10 @@ const DisplayElements = () => {
                                           {userData.nom}
                                         </small>
                                         <small>
-                                          <button className="btn btn-secondary">
+                                          <button
+                                            className="btn btn-secondary"
+                                            onClick={() => toogleShowAddForm(element)}
+                                          >
                                             Editer
                                           </button>
                                         </small>
@@ -318,6 +334,7 @@ const DisplayElements = () => {
                             </div>
                           );
                         })}
+                      {form && selectedData && <Form data={selectedData} onClose={closeModal} />}
                     </div>
                   </div>
                 </div>
