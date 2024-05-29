@@ -1,83 +1,75 @@
 .menu-container {
-    position: relative;
-  }
-  .menuButton {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    gap: 13%;
-    color: #090909;
-    max-width: 10vw;
-    max-height: 10vh;
-    height: 4vh;
-    border-radius: 0.5em;
-    background: #E3FEF7;
-    transition: all .3s;
-    box-shadow: 2px 2px 12px black,
-               -6px -6px 12px #E3FEF7;
-    cursor: pointer;
-    position: absolute;
-    right: 9%;
-    padding: 1vh;
-  }
-  
-  .menuButton:hover {
-    border: 1px solid white;
-  }
-  
-  .menuButton:active {
-    color: #666;
-    box-shadow: inset 4px 4px 12px black,
-               inset -4px -4px 12px #E3FEF7;
-  }
-  
-  .menu-checkbox {
-    display: none;
-  }
-      
-  /* Styles pour les options du menu */
-  .menu-options {
-    display: none;
-    position: absolute;
-    top: 2.7em;
-    right: 10%;
-    background: #E3FEF7;
-    box-shadow: 2px 2px 12px black,
-                -6px -6px 12px #E3FEF7;
-    border-radius: 0.5em;
-    padding: 1em;
-    list-style: none;
-    z-index: 1;
-  }
-  
-  .menu-checkbox:checked ~ .menu-options {
-    display: block;
-  }
-  
-  .menu-options ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    text-align: left;
-  }
-  
-  .menu-options li {
-    margin: 0.5em 0;
-  }
-  
-  .menu-options a {
-    text-decoration: none;
-    color: #090909;
-    transition: color 0.3s;
-  }
-  
-  .menu-options a:hover {
-    color: #666;
-  }
-  
-  
-  .menuButton img {
-    max-width: 4vw;
-    max-height: 4vh;
-  }
+  position: relative;
+}
+.menuButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 13%;
+  color: #090909;
+  max-width: 10vw;
+  max-height: 10vh;
+  height: 4vh;
+  border-radius: 0.5em;
+  background: #e3fef7;
+  transition: all 0.3s;
+  box-shadow: 2px 2px 12px black, -6px -6px 12px #e3fef7;
+  cursor: pointer;
+  position: absolute;
+  right: 9%;
+  padding: 1vh;
+}
+
+.menuButton:active {
+  color: #666;
+  box-shadow: inset 4px 4px 12px black, inset -4px -4px 12px #e3fef7;
+}
+
+.menu-checkbox {
+  display: none;
+}
+
+/* Styles pour les options du menu */
+.menu-options {
+  display: none;
+  position: absolute;
+  top: 2.7em;
+  right: 10%;
+  background: #e3fef7;
+  box-shadow: 2px 2px 12px black, -6px -6px 12px #e3fef7;
+  border-radius: 0.5em;
+  padding: 1em;
+  list-style: none;
+  z-index: 1;
+}
+
+.menu-checkbox:checked ~ .menu-options {
+  display: block;
+}
+
+.menu-options ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.menu-options li {
+  margin: 0.5em 0;
+}
+
+.menu-options a {
+  text-decoration: none;
+  color: #090909;
+  transition: color 0.3s;
+}
+
+.menu-options a:hover {
+  color: #666;
+}
+
+.menuButton img {
+  max-width: 4vw;
+  max-height: 4vh;
+}

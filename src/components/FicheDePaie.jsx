@@ -69,10 +69,10 @@ const FicheDePaie = () => {
             <table>
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Client</th>
-                  <th>Catégorie</th>
-                  <th>Nombre d'heures</th>
+                  <td>Date</td>
+                  <td>Client</td>
+                  <td>Catégorie</td>
+                  <td>Nombre d'heures</td>
                 </tr>
               </thead>
               <tbody>

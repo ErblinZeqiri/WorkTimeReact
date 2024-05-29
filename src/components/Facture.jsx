@@ -18,20 +18,23 @@ const Facture = () => {
     return total + hours + minutes / 60;
   }, 0);
   const navigate = useNavigate();
-
+  
   useEffect(() => {
     const fetchData = async () => {
       const database = getDatabase(firebaseApp);
-      const entrepriseRef = ref(database, `entreprises/entreprise1`);
-      const snapshot = await get(entrepriseRef);
+      if (database._instanceStarted) {
+        const entrepriseRef = ref(database, `entreprises/entreprise1`);
+        const snapshot = await get(entrepriseRef);
 
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        setClients(data.clients || {});
-        setTarifHoraire(data.prix_prestation_heure || 0);
-      } else {
-        console.log("No data available");
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          setClients(data.clients || {});
+          setTarifHoraire(data.prix_prestation_heure || 0);
+        } else {
+          console.log("No data available");
+        }
       }
+      
       setLoading(false);
     };
     fetchData();
@@ -47,10 +50,6 @@ const Facture = () => {
     );
   }
 
-  const retour = () => {
-    navigate("/dashboard");
-  };
-
   const client = Object.values(clients).find(
     (c) => c.nom === prestationsDuMois[0].client
   );
@@ -65,13 +64,13 @@ const Facture = () => {
 
   return (
     <>
-      <div className="facture">
+      <div className="resultat">
         <h1>Facture</h1>
-        <button onClick={() => retour()}>Retour</button>
+        <button onClick={() => navigate("/dashboard")}>Retour</button>
         <br />
         <h2>{client.nom}</h2>
         <br />
-        <div className="presta">
+        <div className="content">
           <table>
             <tr>
               <td>Date</td>

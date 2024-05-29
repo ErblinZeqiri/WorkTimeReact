@@ -50,6 +50,7 @@
 
 .btn-link {
   --green: #1bfd9c;
+  text-decoration: none;
   font-size: 15px;
   padding: 0.7em 2.7em;
   letter-spacing: 0.06em;

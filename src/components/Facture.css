@@ -4,13 +4,13 @@
     width: 30vw;
 }
 
-.presta {
+.content {
     max-height: 50vh;
     overflow-y: auto;
     margin-bottom: 5vh;
 }
 
-.total table, .presta table {
+.total table, .content table {
     width: 100%;
 }
 
