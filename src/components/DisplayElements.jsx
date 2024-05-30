@@ -7,6 +7,7 @@ import {
   groupByMonth,
   totalHoursMinutes,
   compareMonthToPrevious,
+  months
 } from "./Utils";
 import "./DisplayElements.css";
 import "./loading.css";
@@ -23,20 +24,7 @@ const DisplayElements = () => {
   const [elements, setElements] = useState([]);
   const [filters, setFilters] = useState([]);
   const [usersData, setUsersData] = useState({});
-  const [month] = useState([
-    "Janvier",
-    "Février",
-    "Mars",
-    "Avril",
-    "Mai",
-    "Juin",
-    "Juillet",
-    "Août",
-    "Septembre",
-    "Octobre",
-    "Novembre",
-    "Décembre",
-  ]);
+  const [month] = useState(months);
   const user = useSelector((state) => state.user.userData);
   const firebaseApp = useSelector((state) => state.firebase);
   const [form, setForm] = useState(true);
@@ -142,6 +130,8 @@ const DisplayElements = () => {
 
     return bDate - aDate;
   });
+
+  console.log(sortedMonths)
 
   const ficheDePaie = async (monthYear) => {
     const { uid, nom, prenom, entrepriseId, tarif_horaire } = user;
@@ -335,7 +325,10 @@ const DisplayElements = () => {
                           );
                         })}
                       {form && selectedData && (
-                        <UpdatePresta data={selectedData} onClose={closeModal} />
+                        <UpdatePresta
+                          data={selectedData}
+                          onClose={closeModal}
+                        />
                       )}
                     </div>
                   </div>

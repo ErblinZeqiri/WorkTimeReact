@@ -1,17 +1,9 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  getDatabase,
-  ref,
-  child,
-  get,
-  update,
-  onValue,
-} from "firebase/database";
+import { getDatabase, ref, child, get, update } from "firebase/database";
 import { calculateTimeDifference } from "./Utils";
 import "./DisplayElements.css";
 import "./loading.css";
-import { addPrestation } from "./store";
 
 const UpdatePresta = ({ onClose, data }) => {
   const user = useSelector((state) => state.user.userData);
@@ -106,7 +98,7 @@ const UpdatePresta = ({ onClose, data }) => {
           await update(userRef, updates);
         }
       }
-      dispatch(addPrestation(updatedPrestation));
+      dispatch(updatedPrestation);
       onClose();
     } else {
       if (currentPrestation.inter_de > currentPrestation.inter_a) {

@@ -54,7 +54,7 @@ export const calculateTimeDifference = (startTime, endTime) => {
   return { differenceHours, differenceMinutes };
 };
 
-const monthNames = [
+export const months = [
   "janvier",
   "février",
   "mars",
@@ -69,17 +69,33 @@ const monthNames = [
   "décembre",
 ];
 
-export const compareMonthToPrevious = (groupedElements) => {
-  const totalWorkTime = totalHoursMinutes(groupedElements);
-  const months = Object.keys(totalWorkTime).sort((a, b) => {
+export const sortedMonths = (groupedElements) => {
+  Object.keys(groupedElements).sort((a, b) => {
     const [aMonth, aYear] = a.split(" ");
     const [bMonth, bYear] = b.split(" ");
 
     const aDate = new Date(
-      `${aYear}-${monthNames.indexOf(aMonth.toLowerCase()) + 1}-01`
+      `${aYear}-${months.indexOf(aMonth.toLowerCase()) + 1}-01`
     );
     const bDate = new Date(
-      `${bYear}-${monthNames.indexOf(bMonth.toLowerCase()) + 1}-01`
+      `${bYear}-${months.indexOf(bMonth.toLowerCase()) + 1}-01`
+    );
+
+    return bDate - aDate;
+  });
+};
+
+export const compareMonthToPrevious = (groupedElements) => {
+  const totalWorkTime = totalHoursMinutes(groupedElements);
+  const monthss = Object.keys(totalWorkTime).sort((a, b) => {
+    const [aMonth, aYear] = a.split(" ");
+    const [bMonth, bYear] = b.split(" ");
+
+    const aDate = new Date(
+      `${aYear}-${months.indexOf(aMonth.toLowerCase()) + 1}-01`
+    );
+    const bDate = new Date(
+      `${bYear}-${months.indexOf(bMonth.toLowerCase()) + 1}-01`
     );
 
     return aDate - bDate;
@@ -87,13 +103,13 @@ export const compareMonthToPrevious = (groupedElements) => {
 
   const comparison = {};
 
-  months.forEach((currentMonth, index) => {
+  monthss.forEach((currentMonth, index) => {
     if (index === 0) {
       comparison[currentMonth] = null;
       return;
     }
 
-    const previousMonth = months[index - 1];
+    const previousMonth = monthss[index - 1];
     const currentMonthHours =
       totalWorkTime[currentMonth].totalHours +
       totalWorkTime[currentMonth].totalMinutes / 60;

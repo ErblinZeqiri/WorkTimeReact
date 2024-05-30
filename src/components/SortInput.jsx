@@ -83,7 +83,6 @@ const SortInput = ({ month, setFilters }) => {
       inter_a: "",
       mois: "",
     };
-    dispatch(setPrestations(resetState));
     setFilters(resetState);
   };
 
