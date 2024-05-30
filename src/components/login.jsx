@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import "./login.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import GoogleLogin from "./GoogleLogin";
@@ -25,12 +25,8 @@ const Login = () => {
                 <p className="page-link">
                   <span className="page-link-label">Forgot Password?</span>
                 </p>
-                <button className="form-btn">Log in</button>
+                <button className="form-btn">Sign in</button>
               </form>
-              <p className="sign-up-label">
-                Don't have an account?
-                <span className="sign-up-link">Sign up</span>
-              </p>
               <GoogleLogin />
             </div>
           </div>
