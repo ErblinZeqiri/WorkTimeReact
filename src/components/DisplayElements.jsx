@@ -7,7 +7,7 @@ import {
   groupByMonth,
   totalHoursMinutes,
   compareMonthToPrevious,
-  months
+  months,
 } from "./Utils";
 import "./DisplayElements.css";
 import "./loading.css";
@@ -131,8 +131,6 @@ const DisplayElements = () => {
     return bDate - aDate;
   });
 
-  console.log(sortedMonths)
-
   const ficheDePaie = async (monthYear) => {
     const { uid, nom, prenom, entrepriseId, tarif_horaire } = user;
 
@@ -200,7 +198,6 @@ const DisplayElements = () => {
   };
 
   const toogleShowAddForm = (data) => {
-    setForm(!form);
     setSelectedData(data);
     setForm((prevShowForm) => !prevShowForm);
   };

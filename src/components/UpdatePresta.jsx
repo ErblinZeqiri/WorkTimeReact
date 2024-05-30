@@ -97,9 +97,9 @@ const UpdatePresta = ({ onClose, data }) => {
           updates[maxIndex] = updatedPrestation;
           await update(userRef, updates);
         }
+        onClose();
       }
       dispatch(updatedPrestation);
-      onClose();
     } else {
       if (currentPrestation.inter_de > currentPrestation.inter_a) {
         setErrorMessage("Mauvaise saisie des intervalles.");
@@ -109,22 +109,11 @@ const UpdatePresta = ({ onClose, data }) => {
     }
   };
 
-  // const reloadPrestations = async () => {
-  //   const userRef = child(ref(database), `entreprises/${user.entrepriseId}/prestations`);
-  //   const snapshot = await get(userRef);
-
-  //   if (snapshot.exists()) {
-  //     const data = snapshot.val();
-  //     // Mettre à jour l'état local avec les données rechargées
-  //     dispatch(setPrestations(Object.values(data)));
-  //   }
-  // };
-
   return (
     <div className="form-overlay" onClick={onClose}>
       <div className="form-content" onClick={(e) => e.stopPropagation()}>
         <div className="form-box">
-          <form className="form-add-data" onSubmit={handleSubmit}>
+          <form className="form-add-data">
             <a className="closeButton" onClick={onClose}>
               <span className="X"></span>
               <span className="Y"></span>
@@ -197,7 +186,7 @@ const UpdatePresta = ({ onClose, data }) => {
                 onChange={handleChange}
               />
             </div>
-            <button type="submit">Envoyer</button>
+            <button onClick={handleSubmit}>Envoyer</button>
           </form>
         </div>
       </div>

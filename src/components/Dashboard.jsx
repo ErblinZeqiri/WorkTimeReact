@@ -90,7 +90,7 @@ const Dashboard = () => {
         )}
         <br />
         <h2>Listes des heures</h2>
-        <Menu openModal={openModal} logout={logout} />
+        <Menu openModal={openModal} onClose={closeModal} logout={logout} />
         <br />
         {form && <Form onClose={closeModal} />}
         <br />

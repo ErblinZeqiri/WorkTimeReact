@@ -134,12 +134,12 @@ const Form = ({ onClose }) => {
         const newKey = nextIndex.toString();
 
         await update(userRef, { [newKey]: updatedPrestation });
+        onClose();
       } else {
         await update(userRef, { 0: updatedPrestation });
+        onClose();
       }
-
       dispatch(updatedPrestation);
-      onClose();
     } else {
       if (currentPrestation.inter_de > currentPrestation.inter_a) {
         setErrorMessage("Mauvaise saisie des intervalles.");
@@ -153,7 +153,7 @@ const Form = ({ onClose }) => {
     <div className="form-overlay" onClick={onClose}>
       <div className="form-content" onClick={(e) => e.stopPropagation()}>
         <div className="form-box">
-          <form className="form-add-data" onSubmit={handleSubmit}>
+          <form className="form-add-data">
             <a className="closeButton" onClick={onClose}>
               <span className="X"></span>
               <span className="Y"></span>
@@ -226,7 +226,7 @@ const Form = ({ onClose }) => {
                 onChange={handleChange}
               />
             </div>
-            <button type="submit">Envoyer</button>
+            <button onClick={handleSubmit}>Envoyer</button>
           </form>
         </div>
       </div>

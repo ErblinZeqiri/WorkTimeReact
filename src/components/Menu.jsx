@@ -3,7 +3,7 @@ import "./Menu.css";
 import { useSelector } from "react-redux";
 import { useOutsideClick } from "./useOutsideClick";
 
-const Menu = ({ openModal, logout }) => {
+const Menu = ({ openModal, onClose, logout }) => {
   const user = useSelector((state) => state.user.userData);
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -14,17 +14,21 @@ const Menu = ({ openModal, logout }) => {
   const toggleDropdown = () => {
     setShowDropdown((prevState) => !prevState);
   };
+
   const handleMenuClick = () => {
     toggleDropdown();
+    onClose();
   };
 
   return (
-    <div
-      ref={ref}
-      className={`menu-container dropdown ${showDropdown ? "show" : ""}`}
-    >
-      <input id="check" type="checkbox" className="menu-checkbox" />
-      <label htmlFor="check" className="menuButton" onClick={handleMenuClick}>
+    <div className={`menu-container dropdown`} ref={ref}>
+      <input
+        id="check"
+        type="checkbox"
+        className="menu-checkbox"
+        onClick={handleMenuClick}
+      />
+      <label htmlFor="check" className="menuButton">
         <span>
           {user && <>{user.nom}</>}
           <img src="./src/assets/images/down-arrow.svg" alt="Down Arrow" />
