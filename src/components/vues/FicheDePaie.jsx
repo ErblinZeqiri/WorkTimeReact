@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { groupByMonth } from "./Utils";
+import { groupByMonth } from "../utils/Utils";
 import { ref, get, child, getDatabase } from "firebase/database";
 
 const FicheDePaie = () => {

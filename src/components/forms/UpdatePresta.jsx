@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
-import "./Form.css";
-import { ref, update, child, get, getDatabase } from "firebase/database";
-import { calculateTimeDifference } from "./Utils";
-import { useDispatch, useSelector } from "react-redux";
-import { setClients, setCategories } from "./store";
+import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { getDatabase, ref, child, get, update } from "firebase/database";
+import { calculateTimeDifference } from "../utils/Utils";
+import "../../styles/DisplayElements.css";
+import "../../styles/loading.css";
 
-const Form = ({ onClose }) => {
+const UpdatePresta = ({ onClose, data }) => {
   const user = useSelector((state) => state.user.userData);
   const clients = useSelector((state) => state.clients);
   const firebaseApp = useSelector((state) => state.firebase);
@@ -13,61 +13,8 @@ const Form = ({ onClose }) => {
   const database = getDatabase(firebaseApp);
   const dispatch = useDispatch();
 
-  const initialPrestationState = {
-    userId: user.uid,
-    date: "",
-    client: "",
-    categorie: "",
-    description: "",
-    inter_de: "",
-    inter_a: "",
-    total_inter: 0,
-  };
-
-  const [currentPrestation, setCurrentPrestation] = useState(
-    initialPrestationState
-  );
+  const [currentPrestation, setCurrentPrestation] = useState(data);
   const [errorMessage, setErrorMessage] = useState("");
-
-  useEffect(() => {
-    const fetchClients = async () => {
-      const entrepriseRef = child(
-        ref(database),
-        `entreprises/${user.entrepriseId}/clients`
-      );
-      const snapshot = await get(entrepriseRef);
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        dispatch(setClients(Object.values(data)));
-      } else {
-        console.log("No clients available");
-      }
-    };
-
-    if (user?.entrepriseId) {
-      fetchClients();
-    }
-  }, [database, user?.entrepriseId, dispatch]);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      const entrepriseRef = child(
-        ref(database),
-        `entreprises/${user.entrepriseId}/categories_prestations`
-      );
-      const snapshot = await get(entrepriseRef);
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        dispatch(setCategories(Object.values(data)));
-      } else {
-        console.log("No categories available");
-      }
-    };
-
-    if (user?.entrepriseId) {
-      fetchCategories();
-    }
-  }, [database, user?.entrepriseId, dispatch]);
 
   const handleDateChange = (event) => {
     const { value } = event.target;
@@ -126,17 +73,30 @@ const Form = ({ onClose }) => {
 
       if (snapshot.exists()) {
         const data = snapshot.val();
-        const maxIndex = Math.max(
-          ...Object.keys(data).map((key) => parseInt(key, 10)),
-          -1
-        );
-        const nextIndex = maxIndex + 1;
-        const newKey = nextIndex.toString();
+        let prestationId = null;
 
-        await update(userRef, { [newKey]: updatedPrestation });
-        onClose();
-      } else {
-        await update(userRef, { 0: updatedPrestation });
+        // Vérifiez si la prestation existe déjà
+        for (const [key, value] of Object.entries(data)) {
+          if (value.id === currentPrestation.id) {
+            prestationId = key;
+            break;
+          }
+        }
+
+        if (prestationId !== null) {
+          // Mettre à jour la prestation existante
+          const updates = {};
+          updates[prestationId] = updatedPrestation;
+          await update(userRef, updates);
+        } else {
+          // Ajouter une nouvelle prestation
+          const maxIndex =
+            Math.max(...Object.keys(data).map((key) => parseInt(key, 10)), -1) +
+            1;
+          const updates = {};
+          updates[maxIndex] = updatedPrestation;
+          await update(userRef, updates);
+        }
         onClose();
       }
       dispatch(updatedPrestation);
@@ -234,4 +194,4 @@ const Form = ({ onClose }) => {
   );
 };
 
-export default Form;
+export default UpdatePresta;

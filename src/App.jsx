@@ -1,11 +1,10 @@
-import { useState } from 'react'
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import './App.css'
-import Login from './components/login'
-import Dashboard from './components/Dashboard';
-import FicheDePaie from './components/FicheDePaie';
-import Page404 from './components/Page404';
-import Facture from './components/Facture';
+import Login from './components/authentification/login'
+import Dashboard from './components/dashboard/Dashboard';
+import FicheDePaie from './components/vues/FicheDePaie';
+import Page404 from './components/vues/Page404';
+import Facture from './components/vues/Facture';
 
 function App() {
 

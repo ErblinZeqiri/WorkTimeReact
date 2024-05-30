@@ -3,7 +3,7 @@ import {
   createSlice,
   createAsyncThunk,
 } from "@reduxjs/toolkit";
-import firebaseApp from "../providers/firebaseConfig";
+import firebaseApp from "../../providers/firebaseConfig";
 
 // Création du slice pour l'état de l'utilisateur
 const userSlice = createSlice({

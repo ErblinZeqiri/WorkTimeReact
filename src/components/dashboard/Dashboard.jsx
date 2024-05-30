@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import Form from "./Form";
+import Form from "../forms/Form";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchUserData, setFirebase, setUser } from "./store";
+import { fetchUserData, setFirebase, setUser } from "../utils/store";
 import { getDatabase, ref, get } from "firebase/database";
-import DisplayElements from "./DisplayElements";
+import DisplayElements from "../dashboard/DisplayElements";
 import Menu from "./Menu";
 
 const Dashboard = () => {

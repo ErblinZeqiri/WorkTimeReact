@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import "./Menu.css";
+import "../../styles/Menu.css";
 import { useSelector } from "react-redux";
-import { useOutsideClick } from "./useOutsideClick";
+import { useOutsideClick } from "../utils/useOutsideClick";
 
 const Menu = ({ openModal, onClose, logout }) => {
   const user = useSelector((state) => state.user.userData);

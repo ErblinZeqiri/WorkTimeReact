@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ref, get, child, getDatabase } from "firebase/database";
-import { setClients, setCategories } from "./store";
+import { setClients, setCategories } from "../utils/store";
 import { useSelector, useDispatch } from "react-redux";
 
 const SortInput = ({ month, setFilters }) => {

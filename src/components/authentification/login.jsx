@@ -1,8 +1,8 @@
 import React from "react";
-import "./login.css";
+import "../../styles/login.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import GoogleLogin from "./GoogleLogin";
-import ApiData from "../providers/ApiData";
+import ApiData from "../../providers/ApiData";
 
 const Login = () => {
   return (

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchUserData, setClients } from "./store";
+import { fetchUserData, setClients } from "../utils/store.js";
 import { getDatabase, ref, child, get, onValue } from "firebase/database";
 import {
   calculateTimeDifference,
@@ -8,16 +8,16 @@ import {
   totalHoursMinutes,
   compareMonthToPrevious,
   months,
-} from "./Utils";
-import "./DisplayElements.css";
-import "./loading.css";
+} from "../utils/Utils.jsx";
+import "../../styles/DisplayElements.css";
+import "../../styles/loading.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
-import SortInput from "./SortInput";
+import SortInput from "../vues/SortInput.jsx";
 import { useNavigate } from "react-router-dom";
 import { ArrowDownOutlined, ArrowUpOutlined } from "@ant-design/icons";
 import { Card, Col, Row, Statistic } from "antd";
-import UpdatePresta from "./UpdatePresta.jsx";
+import UpdatePresta from "../forms/UpdatePresta.jsx";
 
 const DisplayElements = () => {
   const dispatch = useDispatch();

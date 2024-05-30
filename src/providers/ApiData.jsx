@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useOutsideClick } from "../components/useOutsideClick";
+import { useOutsideClick } from "../components/utils/useOutsideClick";
 
 const ApiData = () => {
   const [lien, setLien] = useState(null);

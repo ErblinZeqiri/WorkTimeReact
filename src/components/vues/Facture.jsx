@@ -3,8 +3,8 @@ import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getDatabase, ref, get } from "firebase/database";
-import "./loading.css";
-import "./Facture.css";
+import "../../styles/loading.css";
+import "../../styles/Facture.css";
 
 const Facture = () => {
   const location = useLocation();

@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { setUser } from "./store";
+import { setUser } from "../utils/store";
 
 const GoogleLogin = () => {
   const dispatch = useDispatch();
