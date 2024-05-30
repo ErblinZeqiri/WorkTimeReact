@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchUserData, setClients } from "./store";
-import { getDatabase, ref, child, get } from "firebase/database";
+import { getDatabase, ref, child, get, onValue } from "firebase/database";
 import {
   calculateTimeDifference,
   groupByMonth,
@@ -52,39 +52,37 @@ const DisplayElements = () => {
   // Fetch prestations data and user data when user is available
   useEffect(() => {
     if (user) {
-      const fetchData = async () => {
-        const database = getDatabase(firebaseApp);
-        const prestationsRef = child(
-          ref(database),
-          `entreprises/${user.entrepriseId}/prestations`
-        );
-        const usersRef = child(ref(database), `users/`);
-        try {
-          const [prestationsSnapshot, usersSnapshot] = await Promise.all([
-            get(prestationsRef),
-            get(usersRef),
-          ]);
+      const database = getDatabase(firebaseApp);
+      const prestationsRef = child(
+        ref(database),
+        `entreprises/${user.entrepriseId}/prestations`
+      );
+      const usersRef = child(ref(database), `users/`);
 
-          if (prestationsSnapshot.exists() && usersSnapshot.exists()) {
-            const prestationsData = prestationsSnapshot.val();
-            const usersData = usersSnapshot.val();
-            const userPresta =
-              user.role === "admin"
-                ? Object.entries(prestationsData)
-                : Object.entries(prestationsData).filter(
-                    ([key, element]) => element && element.userId === user.uid
-                  );
-            setElements(userPresta);
-            setUsersData(usersData);
-          } else {
-            console.log("No data available");
-          }
-        } catch (error) {
-          console.error("Error fetching data:", error);
+      // Écouteur en temps réel pour les prestations
+      const prestaListener = onValue(prestationsRef, (snapshot) => {
+        if (snapshot.exists()) {
+          const prestationsData = snapshot.val();
+          const userPresta =
+            user.role === "admin"
+              ? Object.entries(prestationsData)
+              : Object.entries(prestationsData).filter(
+                  ([key, element]) => element && element.userId === user.uid
+                );
+          setElements(userPresta);
         }
-      };
+      });
 
-      fetchData();
+      // Fetch utilisateurs une seule fois
+      get(usersRef).then((usersSnapshot) => {
+        if (usersSnapshot.exists()) {
+          const usersData = usersSnapshot.val();
+          setUsersData(usersData);
+        }
+      });
+
+      // Nettoyage de l'écouteur en temps réel
+      return () => prestaListener();
     }
   }, [user, firebaseApp]);
 

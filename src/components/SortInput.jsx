@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { ref, get, child, getDatabase } from "firebase/database";
-import { setClients, setPrestations, setCategories } from "./store";
+import { setClients, setCategories } from "./store";
 import { useSelector, useDispatch } from "react-redux";
 
 const SortInput = ({ month, setFilters }) => {
@@ -8,7 +8,7 @@ const SortInput = ({ month, setFilters }) => {
   const user = useSelector((state) => state.user.userData);
   const firebaseApp = useSelector((state) => state.firebase);
   const clients = useSelector((state) => state.clients);
-  const prestations = useSelector((state) => state.prestations);
+  const [prestations, setPrestations] = useState({});
   const categories = useSelector((state) => state.categories);
   const database = getDatabase(firebaseApp);
 
