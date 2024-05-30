@@ -47,17 +47,15 @@ const Dashboard = () => {
           navigate("/");
         }
       } catch (error) {
-        // Gérer les erreurs d'authentification ou de récupération des données utilisateur
         console.error(
           "Une erreur s'est produite lors de la récupération des données utilisateur:",
           error
         );
-        // Afficher un message d'erreur à l'utilisateur ou effectuer une action appropriée
       }
     };
 
-    fetchData(); // Appel de la fonction fetchData pour récupérer les données utilisateur
-    dispatch(setFirebase(firebaseApp)); // Mettre à jour les informations Firebase dans le store
+    fetchData();
+    dispatch(setFirebase(firebaseApp));
     return () => {
       if (unsubscribe) {
         unsubscribe();

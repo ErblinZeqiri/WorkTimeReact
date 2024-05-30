@@ -153,8 +153,9 @@ const DisplayElements = () => {
   };
 
   const facture = (monthYear) => {
+    const {entrepriseId } = user
     const prestationsDuMois = groupedElements[monthYear];
-    navigate("/dashboard/facture", { state: { prestationsDuMois, monthYear } });
+    navigate("/dashboard/facture", { state: { prestationsDuMois, monthYear, entrepriseId } });
   };
 
   const pourcentCardDesign = (pourcent) => {

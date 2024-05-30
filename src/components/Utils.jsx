@@ -1,3 +1,22 @@
+export const calculateTimeDifference = (startTime, endTime) => {
+  const [startHours, startMinutes] = startTime.split(":").map(Number);
+  const [endHours, endMinutes] = endTime.split(":").map(Number);
+
+  const startMilliseconds =
+    startHours * 60 * 60 * 1000 + startMinutes * 60 * 1000;
+  const endMilliseconds = endHours * 60 * 60 * 1000 + endMinutes * 60 * 1000;
+
+  const differenceMilliseconds = endMilliseconds - startMilliseconds;
+
+  const differenceHours = Math.floor(differenceMilliseconds / (60 * 60 * 1000));
+  const differenceMinutes = Math.floor(
+    (differenceMilliseconds % (60 * 60 * 1000)) / (60 * 1000)
+  );
+
+  return { differenceHours, differenceMinutes };
+};
+
+
 export const groupByMonth = (elements) => {
   const grouped = {};
   elements.forEach(([key, element]) => {
@@ -35,25 +54,6 @@ export const totalHoursMinutes = (groupedElements) => {
 
   return totalByMonth;
 };
-
-export const calculateTimeDifference = (startTime, endTime) => {
-  const [startHours, startMinutes] = startTime.split(":").map(Number);
-  const [endHours, endMinutes] = endTime.split(":").map(Number);
-
-  const startMilliseconds =
-    startHours * 60 * 60 * 1000 + startMinutes * 60 * 1000;
-  const endMilliseconds = endHours * 60 * 60 * 1000 + endMinutes * 60 * 1000;
-
-  const differenceMilliseconds = endMilliseconds - startMilliseconds;
-
-  const differenceHours = Math.floor(differenceMilliseconds / (60 * 60 * 1000));
-  const differenceMinutes = Math.floor(
-    (differenceMilliseconds % (60 * 60 * 1000)) / (60 * 1000)
-  );
-
-  return { differenceHours, differenceMinutes };
-};
-
 export const months = [
   "janvier",
   "février",
@@ -87,7 +87,7 @@ export const sortedMonths = (groupedElements) => {
 
 export const compareMonthToPrevious = (groupedElements) => {
   const totalWorkTime = totalHoursMinutes(groupedElements);
-  const monthss = Object.keys(totalWorkTime).sort((a, b) => {
+  const month = Object.keys(totalWorkTime).sort((a, b) => {
     const [aMonth, aYear] = a.split(" ");
     const [bMonth, bYear] = b.split(" ");
 
@@ -103,13 +103,13 @@ export const compareMonthToPrevious = (groupedElements) => {
 
   const comparison = {};
 
-  monthss.forEach((currentMonth, index) => {
+  month.forEach((currentMonth, index) => {
     if (index === 0) {
       comparison[currentMonth] = null;
       return;
     }
 
-    const previousMonth = monthss[index - 1];
+    const previousMonth = month[index - 1];
     const currentMonthHours =
       totalWorkTime[currentMonth].totalHours +
       totalWorkTime[currentMonth].totalMinutes / 60;

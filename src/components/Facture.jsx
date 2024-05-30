@@ -8,7 +8,7 @@ import "./Facture.css";
 
 const Facture = () => {
   const location = useLocation();
-  const { prestationsDuMois, monthYear } = location.state;
+  const { prestationsDuMois, monthYear, entrepriseId } = location.state;
   const firebaseApp = useSelector((state) => state.firebase);
   const [clients, setClients] = useState({});
   const [tarifHoraire, setTarifHoraire] = useState(0);
@@ -23,7 +23,7 @@ const Facture = () => {
     const fetchData = async () => {
       const database = getDatabase(firebaseApp);
       if (database._instanceStarted) {
-        const entrepriseRef = ref(database, `entreprises/entreprise1`);
+        const entrepriseRef = ref(database, `entreprises/${entrepriseId}`);
         const snapshot = await get(entrepriseRef);
 
         if (snapshot.exists()) {

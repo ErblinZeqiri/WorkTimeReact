@@ -8,7 +8,6 @@ const FicheDePaie = () => {
   const location = useLocation();
   const { monthYear, user } = location.state || {};
   const navigate = useNavigate();
-  console.log(user);
 
   useEffect(() => {
     const fetchData = async () => {
