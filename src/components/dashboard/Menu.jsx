@@ -31,7 +31,7 @@ const Menu = ({ openModal, onClose, logout }) => {
       <label htmlFor="check" className="menuButton">
         <span>
           {user && <>{user.nom}</>}
-          <img src="./src/assets/images/down-arrow.svg" alt="Down Arrow" />
+          <img src="/WorkTimeReact/src/assets/images/down-arrow.svg" alt="Down Arrow" />
         </span>
       </label>
       {showDropdown && (

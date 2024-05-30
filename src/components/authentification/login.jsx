@@ -34,7 +34,7 @@ const Login = () => {
         <div className="logo">
           <div className="logoCadre">
             <img
-              src="./src/assets/images/PhotoRoom-20240501_131716.png"
+              src="/WorkTimeReact/src/assets/images/PhotoRoom-20240501_131716.png"
               alt=""
             />
           </div>
